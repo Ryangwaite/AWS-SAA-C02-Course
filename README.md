@@ -171,7 +171,7 @@ A VPC is within 1 account and 1 region which makes it regionally resilient.
 A VPC is private and isolated until decided otherwise.
 
 One default VPC per region. Can have many custom VPCs which are all private
-by default.
+by default. There's a soft limit of 5 VPC's per region - can be increased with support ticket.
 
 #### 1.2.4.1. Default VPC Facts
 
@@ -230,7 +230,7 @@ Charged for all four categories.
 
 #### 1.2.5.3. Stopped State
 
-Charged for EBS storage  only.
+Charged for EBS storage only.
 
 - No CPU resources are being consumed
 - No memory is being used
@@ -289,6 +289,8 @@ This should be the default storage platform
 S3 is an object storage, not file, or block storage.
 You can't mount an S3 Bucket.
 
+S3 is generally region resilient (except S3 One Zone-IA storage class that replicates within a single AZ)
+
 #### 1.2.6.1. Objects
 
 Can be thought of a file. Two main components:
@@ -309,7 +311,7 @@ Other components:
 - Created in a specific AWS Region.
 - Data has a primary home region. Will not leave this region unless told.
 - Blast Radius = Region
-- Unlimited number of Objects
+- Unlimited number of Objects and total data consumed
 - Name is globally unique
 - All objects are stored within the bucket at the same level.
 

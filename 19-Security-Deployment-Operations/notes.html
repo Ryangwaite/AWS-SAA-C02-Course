@@ -1,0 +1,82 @@
+<h2>Security, Deployment, Operations</h2>
+<h3>AWS Secrets Manager</h3>
+<p>It does share functionality with parameter store.</p>
+<p>This is designed specifically for secrets, passwords, API keys.</p>
+<p>Usable via Console, CLI, API, or SDK</p>
+<p>Supports the automatic rotation using Lambda.</p>
+<p>It also directly integrates with RDS and other AWS products. If lambda
+is invoked and changes a secret, the password can automatically
+change in RDS.</p>
+<p>This is great for rotating secrets and especially with RDS.</p>
+<h4>Example</h4>
+<p>The Secrets Manager SDK can be used to retrieve credentials. It can use IAM
+role or access keys to retrieve the secrets.</p>
+<p>Once the application has these secrets, it can access the database.</p>
+<p>Periodically, the lambda function can rotate the secrets. The Lambda uses
+IAM roles to do this.</p>
+<p>The authenticaion in RDS is also rotated automatically.</p>
+<p>Secrets are secured via KMS which ensures role seperation.</p>
+<h3>AWS Shield and WAF (Web Application Firewall)</h3>
+<p>Provides against DDoS attacks with AWS resources. This is a denial of
+service attack. Normally not possible to block them by using individual
+IP addresses. Without detailed anaylsis, the traffic looks like normal
+requests to your website.</p>
+<p>Shield Standard - Free with Route53 and CloudFront as default
+Provides layer 3 and layer 4 protection against DDoS attacks.</p>
+<p>Shield advanced - $3000 per month</p>
+<ul>
+<li>Includes EC2, ELB, CloudFront, Global Acceleration and R53</li>
+<li>Provides access to DDoS advanced response team and financial insurance
+against increased costs.</li>
+</ul>
+<h4>WAF (web application firewall)</h4>
+<p>Layer 7 firewall (HTTP/s) firewall</p>
+<p>Protects against these complex layer 7 attacks like:</p>
+<p>SQL injections, cross-site scripting, geo blocks, rate awareness.</p>
+<p>Main entity provided is a WEBACL that is integrated with Load Balancers,
+API gateways, and cloudfront.</p>
+<p>The rules are added to WEBACL and evaluated when traffic arrives.</p>
+<h4>Example of Architecture</h4>
+<p>Shield standard automatically looks at the data before any data reaches
+past Route53.</p>
+<p>The user is directed to the closest CloudFront location. Again, shield
+standard looks at the data again before it moves on.</p>
+<p>WAF Rules are defined and included in a WEBACL which is associated to a
+cloud front distribution and deployed to the edge.</p>
+<p>Shield advanced can then intercept traffic when it reaches the load balancer.</p>
+<p>Once the data reaches the VPC, it has been filtered at Layer 3, 4, and 7
+already.</p>
+<p>Layer 7 filtering is only provided by WAF.</p>
+<h3>CloudHSM</h3>
+<p>An applicance which creates and managed cryptographic material such as keys.</p>
+<p>KMS is a shared service with other AWS accounts.</p>
+<p>Although the permissions are strict, AWS still does manage the hardware for KMS.</p>
+<p>You can run your own HSM on premise. Cloud HSM is a true &quot;single tenant&quot;
+hardware security module (HSM)</p>
+<p>AWS provisioned, but it is impossible for them to help. There is no way
+to recover data from them if access is lost.</p>
+<p>Fully FIPS 140-2 Level 3 (KSM is L2 overall, but some is L3)</p>
+<p>IF you require level 3 overall, you MUST use CloudHSM.</p>
+<p>KSM all actions are performed with AWS CLI and IAM roles.</p>
+<p>HSM uses</p>
+<ul>
+<li>PKCS#11</li>
+<li>Java Cryptography Extensions (JCE)</li>
+<li>Microsoft CryptoNG (CNG) libraries</li>
+</ul>
+<p>KMS can use CloudHSM as a custom key store, CloudHSM integrates with KMS.</p>
+<p>HSM is not highly available and runs within one AZ. You need at least
+two HSMs and one in each AZ you use. Once HSM is in a cluster, they
+replicate all policies in sync automatically.</p>
+<p>HSM needs an endpoint in the subnet of the VPC to allow resources access
+to the cluster.</p>
+<p>AWS has no access to the HSM appliances which store the keys.</p>
+<h4>Cloud HSM Use Cases</h4>
+<p>No native AWS integration with AWS products. You can't use S3 SSE with
+CloudHSM.</p>
+<p>Can be used to offload the SSL/TLS processing for the webservers. CloudHSM
+is much more efficent to do these encryption processes.</p>
+<p>Oracle Databases can use CloudHSM to enable transparent data encryption (TDE)</p>
+<p>This can be used to protect the private keys for an issuing
+certificate authority.</p>
+<p>Anything that needs to interact with non AWS products.</p>
