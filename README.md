@@ -587,18 +587,18 @@ Hosted on four managed name servers
 
 ### 1.2.14. DNS Record
 
-- Nameserver (NS): Allows delegation to occur in the DNS.
-- A and AAAA Records: Maps the host to a v4 or v6 host type respectively. Most of the time
+- **Nameserver (NS)**: Allows delegation to occur in the DNS.
+- **A and AAAA Records**: Maps the host to a v4 or v6 host type respectively. Most of the time
 you will make both types of record, A and AAAA.
-- CNAME Record Type: Allows DNS shortcuts to reduce admin overhead.
+- **CNAME Record Type**: Allows DNS shortcuts to reduce admin overhead.
 CNAMES cannot point directly to an IP address, only another name.
-- MX records: How emails are sent. They have two main parts:
+- **MX records**: How emails are sent. They have two main parts:
   - Priority: Lower values for the priority field are higher priority.
   - Value
     - If it is just a host, it will not have a dot on the right. It is assumed
 to be part of the same zone as the host.
     - If you include a dot on the right, it is a ***fully qualified domain name***
-- TXT Record: Allows you to add arbitrary text to a domain.
+- **TXT Record**: Allows you to add arbitrary text to a domain.
 One common usage is to prove domain ownership.
 
 #### 1.2.14.1. TTL - Time To Live
@@ -611,7 +611,7 @@ If you need to upgrade the records, it is smart to lower the TTL value first.
 Getting the answer from an Authoritative Source is known as an
 **Authoritative Answer**.
 
-If another client queries the same thing, they will get back a
+If another DNS server responds to the clients request, they will get back a
 **Non-Authoritative** response.
 
 ---
@@ -631,7 +631,7 @@ Once authenticated, that identity is known as an **authenticated identity**
 #### 1.3.1.1. Statement Components
 
 - Statement ID (SID): Optional field that should help describe
-  - The resource you're interacting
+  - The resource you're interacting with
   - The actions you're trying to perform
 - Effect: is either `allow` or `deny`.
   - It is possible to be allowed and denied at the same time
@@ -751,7 +751,7 @@ IAM Roles are **assumed** you become that role.
 
 This can be used short term by other identities.
 
-IAM Users can have inline or managed policies which control which permissions
+IAM roles can have inline or managed policies which control which permissions
 the identity gets within AWS
 
 Policies which grant, allow or deny, permissions based on their associations.
@@ -874,11 +874,10 @@ JSON policy document that can be attached:
 - A specific Organizational Unit
 - A specific member only.
 
-The master account cannot be restricted by SCPs which means this
-should not be used because it is a security risk.
+The management account cannot be restricted by SCPs.
 
-SCPs limit what the account, **including root** can do inside that account.
-They don't grant permissions themselves, just act as a barrier.
+SCPs limit what the member account, **including root** can do inside that account.
+They don't grant permissions themselves, just act as a limit on the actions that the member accounts administrators can delegate to the IAM users and roles within.
 
 #### 1.3.7.1. Allow List vs Deny List
 
@@ -918,7 +917,7 @@ You must then add any services you want to Deny such as `DenyS3`
 **Deny List** is a good default because it allows for the use of growing
 services offered by AWS. A lot less admin overhead.
 
-**Allow List** allows you to be conscience of your costs.
+**Allow List** allows you to be conscious of your costs.
 
 - To begin, you must remove the `FullAWSAccess` list
 - Then, specify which services need to be allowed access.
@@ -942,16 +941,18 @@ services offered by AWS. A lot less admin overhead.
 
 ### 1.3.8. CloudWatch Logs
 
-This is a public service, this can be used from AWS VPC or on premise
+This is a public service, which can be accessed from AWS VPC or on premise
 environment.
 
-This allows to **store**, **monitor** and **access** logging data.
+This lets us **store**, **monitor** and **access** logging data.
 
 - This is a piece of information data and a timestamp
 - Can be more fields, but at least these two
 
 Comes with some AWS Integrations.
+
 Security is provided with IAM roles or Service roles
+
 Can generate metrics based on logs **metric filter**
 
 #### 1.3.8.1. Architecture of CloudWatch Logs
@@ -979,13 +980,15 @@ Stores the last 90 days of events in the **Event History**. This is enabled
 by default and is no additional cost.
 
 To customize the service you need to create a new **trail**.
-Two types of events. Default only logs Management Events
+Two types of events:
+ - Default only logs
+ - Management Events
 
-- Management Events:
+**Management Events**:
 Provide information about management operations performed on resources
 in the AWS account. Create an EC2 instance or terminating one.
 
-- Data Events:
+**Data Events**:
 Objects being uploaded to S3 or a Lambda function being invoked. This is not
 enabled by default and must be enabled for that trail.
 
