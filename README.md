@@ -1054,7 +1054,7 @@ This is a **resource policy**
 - can allow or deny anonymous principals
   - this is explicitly declared in the bucket policy itself.
 
-Different from an **identity policy**
+Different from an **identity policy** which:
 
 - controls what that identity can access
 - can only be attached to identities in your own account
@@ -1186,9 +1186,9 @@ Multipart Upload
 S3 Accelerated Transfer
 
 - Off by default.
-- Uses the network of AWS edge locations to speed up transfer.
+- Uses the network of AWS edge locations in CloudFront to speed up transfer.
 - Bucket name cannot contain periods.
-- Name must be DNS compatible.
+- Name must be DNS-compliant.
 - Benefits improve the larger the location and distance.
   - The worse the start, the better the performance benefits.
 
@@ -1229,7 +1229,7 @@ The public key is uploaded to cloud storage.
 The data is encrypted and sent back to the original entity.
 The private key can decrypt the data.
 
-This is secure because stolen public keys can only encrypt data.
+This is secure because public keys can only encrypt data.
 Private keys must be handled securely.
 
 #### 1.4.5.6. Signing
@@ -1312,20 +1312,23 @@ Architecture
 #### 1.4.6.3. KMS Key Concepts
 
 - Customer Master Keys (CMK) are isolated to a region.
-  - Never leave the region or KMS.
+  - Symmetric CMKs and private keys of asymmetric CMKs never leave the region or KMS unencrypted.
   - Cannot extract a CMK.
-- AWS managed CMKs
+- **AWS managed CMKs**:
   - Created automatically by AWS when using a service such
   as S3 which uses KMS for encryption.
-- Customer managed CMKS
+- **Customer managed CMKs**:
   - Created explicitly by the customer.
   - Much more more configurable, for example the key policy can be edited.
   - Can allow other AWS accounts access to CMKS
+-  **AWS owned CMKs**:
+   - collection of CMKs that an AWS service owns and manages for use in multiple AWS accounts.
+   - Don't create or manage these and also cannot view, use, track or audit them
+   - Not charged a monthly fee or usage fee for AWS owned CMKs
 
-All CMKs support key rotation.
-
-- AWS automatically rotates the keys every 1095 days (3 years)
-- Customer managed keys rotate every year.
+All CMKs support key rotation. AWS automatically rotates the keys:
+- Customer managed CMKs -> every 365 days (1 year)
+- AWS managed CMK -> every 1095 days (3 years)
 
 CMK itself contains:
 
@@ -1334,8 +1337,7 @@ CMK itself contains:
 
 KMS can create an alias which is a shortcut to a particular CMK.
 Aliases are also per region. You can create a `MyApp1` alias in all regions
-but they would be separate aliases, and in each region it would be pointing
-potentially at a different CMK.
+but they would be separate aliases, and in each region it would be pointing at a different CMK.
 
 #### 1.4.6.4. Key Policy (resource policy)
 
