@@ -1412,15 +1412,12 @@ SSE-C Encryption Steps
 
 1. When placing an object in S3, you provide encryption key and plaintext object
 2. Once the key and object arrive, it is encrypted.
-3. A hash of the key is taken and attached to the object.
-The hash can identify if the specific key was used to encrypt the object.
+3. A hash of the key is taken and attached to the object. The hash can identify if the specific key was used to encrypt the object.
 4. The key is then discarded after the hash is taken.
 5. The encrypted and one-way hash are stored persistently on storage.
 
 To decrypt the object, you must tell S3 which object to decrypt and provide
-it with the key used to encrypt it. If the key that you supply is correct,
-the proper hash, S3 will decrypt the object, discard the key, and return the
-plaintext version of the object.
+it with the key used to encrypt it. If the key that you supply is correct (matching hash), S3 will decrypt the object, discard the key, and return the plaintext version of the object.
 
 #### 1.4.8.2. SSE-S3 AES256 (Server-side encryption w/ Amazon S3 managed keys)
 
@@ -1513,7 +1510,7 @@ disaster recovery files. The requirement for data to be safe is most important.
 - Designed for data that is accessed less frequently but needed quickly.
 - 80% of the base cost of Standard-IA.
 - Same minimum size and duration fee as Standard-IA
-- Data is only stored in a single AZ, no 3+ AZ replication.
+- Data is **only stored in a single AZ**, no 3+ AZ replication.
 - 99.5% availability, lower than Standard-IA
 
 Great choice for secondary copies of primary data or backup copies.
@@ -1550,7 +1547,7 @@ Retrieval methods:
 
 #### 1.4.9.6. S3 Intelligent-Tiering
 
-- Combination of standard and standard IA.
+- Combination of standard, standard-IA, S3 Glacier and S3 glacier deep archive.
 - Uses automation to remove overhead of moving objects.
 - Additional fee of $0.0025 per 1,000 objects tracked.
 - If an object is not accessed for 30 days, it will move into Standard-IA.
@@ -1559,18 +1556,18 @@ This is good for objects that are unknown their access pattern.
 
 ### 1.4.10. Object Lifecycle Management
 
-Intelligent-Tiering is used for objects where access patterns is unknown.
+Intelligent-Tiering is used for objects where access patterns are unknown.
 A lifecycle configuration is a set of **rules** that consists of **actions**.
 
 #### 1.4.10.1. Transition Actions
 
 Change the storage class over time such as:
 
-- Move an object from S3 to IA after 90 days
+- Move an object from S3 to IA (infrequently accessed) after 90 days
 - After 180 days move to Glacier
 - After one year move to Deep Archive
 
-Objects must flow downwards, they can't flow in the reverse direction.
+**Objects must flow downwards, they can't flow in the reverse direction.**
 
 #### 1.4.10.2. Expiration Actions
 
@@ -1711,7 +1708,7 @@ some corporations. Some IP addresses was always left unused.
   - Half of range class B
   - Starts at `192.0.0.0` and ends at `223.255.255.255`.
 
-#### 1.5.1.3. Internet / Private IPs - RFC1918
+#### 1.5.1.3. Internal / Private IPs - RFC1918
 
 These can't communicate over the internet and are used internally only
 
@@ -1798,8 +1795,8 @@ VPC Consideration
 - VPC structure with tiers and resilience (availability) zones
 - VPC min /28 network (16 IP)
 - VPC max /16 (65456 IP)
-- Avoid common range 10.0 or 10.1, include up to 10.10
-  - Suggest starting of 10.16 for a nice clean base 2 number.
+- Avoid common range 10.0.0.0 or 10.1.0.0, include up to 10.10.0.0
+  - Suggest starting of 10.16.0.0 for a nice clean base 2 number.
 
 Reserve 2+ network ranges per region being used per account.
 Think of the highest region you will operate in and add extra as a buffer.
