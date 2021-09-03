@@ -1873,14 +1873,14 @@ Two options that manage how DNS works in a VPC:
 
 - AZ Resilient subnetwork of a VPC.
   - If the AZ fails, the subnet and services also fail.
-  - High availability needs multiple components into different AZs.
+  - High availability means multiple components into different AZs.
 - 1 subnet can only have 1 AZ.
 - 1 AZ can have zero or many subnets.
 - IPv4 CIDR is a subset of the VPC CIDR block.
   - Cannot overlap with any other subnets in that VPC
 - Subnet can optionally be allocated IPv6 CIDR block.
   - (256 /64 subnets can fit in the /56 VPC)
-- Subnets can communicate with other subnets in the VPC by default.
+- **Subnets can communicate with other subnets in the VPC by default.**
 
 #### 1.5.4.1. Reserved IP addresses
 
