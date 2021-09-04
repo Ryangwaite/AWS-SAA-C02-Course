@@ -2001,14 +2001,13 @@ with your on premise identification service.
 ### 1.5.6. Network Access Control List (NACL)
 
 Network Access Control Lists (NACLs) are a type of security filter
-(like firewalls) which can filter traffic as it enters or leaves a subnet.
+(like firewalls) which can filter traffic as it enters or leaves a **subnet**.
 
-All VPCs have a default NACL, this is associated with all subnets of that VPC
-by default.
+All VPCs have a default NACL, this is associated with all subnets of that VPC by default.
 NACLs are used when traffic enters or leaves a subnet.
 Since they are attached to a subnet and not a resource, they only filter
 data as it crosses in or out.
-If two EC2 instances in a VPC communicate, the NACL does nothing because
+If two EC2 instances in a subnet communicate, the NACL does nothing because
 it is not involved.
 
 NACLs have an inbound and outbound sets of rules.
@@ -2049,7 +2048,7 @@ If no other rules match the traffic being evaluated, it will be denied.
   - Initiation
   - Response
 - Bob is initiating a connection to the server to ask for a webpage
-- Server will respond with an **Ephemeral** port
+- Server will respond to an **Ephemeral** port on the client
 - Bob talks to the webserver connecting to a port on that server (tcp/443)
   - This is a well known port number
 - Bob's PC tells the server it can talk to back to Bob on a specific port
@@ -2074,7 +2073,7 @@ thing, you need to use NACLs.
 No logical resources can be changed with them.
 - NACLs cannot be assigned to specific AWS resources.
 - NACLs can be used with security groups to add explicit deny (Bad IPs/nets)
-- One subnet can only be assigned to one NACL at a time.
+- One subnet can only be assigned to one NACL at a time. But a NACL can be assigned to multiple subnets.
 
 NACLs are processed in order starting at the lowest rule number until
 it gets to the catch all. A rule with a lower rule number will be processed
@@ -2091,8 +2090,7 @@ before another rule with a higher rule number.
 - Understand AWS logical resources so they're not limit to IP traffic only.
   - Can have a source and destination referencing the instance and not the IP.
 - Default SG is created in a VPC to allow all traffic.
-  - Does so by referencing itself. Anything this SG is attached to is matched
-  by this rule.
+  - Does so by referencing itself. Anything this SG is attached to is matched by this rule.
 - SGs have a hidden implicit **Deny**.
   - Anything that is not allowed in the rule set for the SG is implicitly denied.
 - SG cannot explicit deny anything.
@@ -2103,8 +2101,7 @@ before another rule with a higher rule number.
 - NACLs are used when products cannot use SGs, e.g. NAT Gateways.
 - NACLs are used when adding explicit deny, such as bad IPs or bad actors.
 - SGs is the default almost everywhere because they are stateful.
-- NACLs are associated with a subnet and only filter traffic that crosses
-that boundary. If the resource is in the same subnet, it will not do anything.
+- NACLs are associated with a subnet and only filter traffic that crosses that boundary. If the resource is in the same subnet, it will not do anything.
 
 ### 1.5.8. Network Address Translation (NAT) Gateway
 
@@ -2124,8 +2121,7 @@ returned.
   - Allocated to your account
 - AZ resilient service , but HA in that AZ.
   - If that AZ fails, there is no recovery.
-- For a fully region resilient service, you must deploy one NATGW in each AZ
-with a Route Table in each AZ with NATGW as target.
+- For a fully region resilient service, you must deploy one NATGW in each AZ with a Route Table in each AZ with NATGW as target.
 - NAT instance is limited by capabilities of the instance it is running on and that instance is also general purpose, so won't offer the same level of custom design performance as NAT Gateway.
 - NAT instance is single instance running in single AZ it'll fail if EC2 hardware fails, network fails, storage fails or AZ itself fails.
 - NAT Gateway has benefit over NAT instance, inside one AZ it is highly available.
@@ -2134,12 +2130,10 @@ with a Route Table in each AZ with NATGW as target.
 - You cannot use SG with NAT instance, you can only use NACLs.
 - NAT is not required for IPv6. Inside AWS all IPv6 addresses are publicly routable. IG works with all IPv6 addresses directly.
 - That means if you choose to make an instance in private subnet that have a default IPv6 route to IG, it'll become public instance.
-- Managed service, scales up to 45 Gbps. Can deploy multiple NATGW to increase
-bandwidth.
+- Managed service, scales up to 45 Gbps. Can deploy multiple NATGW to increase bandwidth.
 - AWS charges on usage per hour and data volume processed.
 
-NATGW cannot do port forwarding or be a bastion server. In that case it might
-be necessary to run a NAT EC2 instance instead.
+NATGW cannot do port forwarding or be a bastion server. In that case it might be necessary to run a NAT EC2 instance instead.
 
 ---
 
@@ -2158,24 +2152,20 @@ Servers are configured in three sections without virtualization.
 - User Mode
   - Runs applications.
   - Can make a **system call** to the Kernel to interact with the hardware.
-  - If an app tries to interact with the hardware without a system call, it
-  will cause a system error and can crash the server or at minimum the app.
+  - If an app tries to interact with the hardware without a system call, it will cause a system error and can crash the server or at minimum the app.
 
 #### 1.6.1.1. Emulated Virtualization - Software Virtualization
 
 Host OS operated on the HW and included a hypervisor (HV).
 SW ran in privileged mode and had full access to the HW.
-Guest OS wrapped in a VM and had devices mapped into their OS to emulate real
-HW. Drivers such as graphics cards were all SW emulated to allow the process
-to run properly.
+Guest OS wrapped in a VM and had devices mapped into their OS to emulate real HW. Drivers such as graphics cards were all SW emulated to allow the process to run properly.
 
 The guest OS still believed they were running on real HW and tried
 to take control of the HW. The areas were not real and only allocated
 space to them for the moment.
 
 The HV performs **binary translation**.
-System calls are intercepted and translated in SW on the way. The guest OS needs
-no modification, but slows down a lot.
+System calls are intercepted and translated in SW on the way. The guest OS needs no modification, but slows down a lot.
 
 #### 1.6.1.2. Para-Virtualization
 
@@ -2195,7 +2185,7 @@ What matters for a VM is the input and output operations such
 as network transfer and disk IO. The problem is multiple OS try to access
 the same piece of hardware but they get caught up on sharing.
 
-#### 1.6.1.4. SR-IOV (Singe Route IO virtualization)
+#### 1.6.1.4. SR-IOV (Single Root I/O Virtualization)
 
 Allows a network or any card to present itself as many mini cards.
 As far as the HV is concerned, they are real dedicated cards for their
@@ -2204,17 +2194,14 @@ handles it all. In EC2 this feature is called **enhanced networking**.
 
 ### 1.6.2. EC2 Architecture and Resilience
 
-EC2 instances are virtual machines run on EC2 hosts.
+EC2 instances are virtual machines that run on EC2 hosts.
 
 Tenancy:
 
 - **Shared** - Instances are run on shared hardware, but isolated from other customers.
-- **Dedicated** - Instances are run on hardware that's dedicates to a single customer.
-  Dedicated instances may share hardware with other instances from the same AWS account
-  that are not Dedicated instances.
+- **Dedicated** - Instances are run on hardware that's dedicated to a single customer. Dedicated instances may share hardware with other instances from the same AWS account that are not Dedicated instances.
 - **Dedicated host** - Instances are run on a physical server fully dedicated for your use.
   Pay for entire host, don't pay for instances.
-
 - AZ resilient service. They run within only one AZ system.
   - You can't access them cross zone.
 
