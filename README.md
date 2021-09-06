@@ -2246,9 +2246,9 @@ Long running compute needs. Many other AWS services have run time limits.
 Server style applications
 
 - things waiting for network response
-- burst or stead-load
+- burst or steady-load
 - monolithic application stack
-  - middle ware or specific run time components
+  - middle-ware or specific run time components
 - migrating application workloads or disaster recovery
   - existing applications running on a server and a backup system to intervene
 
@@ -2300,7 +2300,7 @@ You can mount an EBS volume or boot off an EBS volume.
 files by traversing the storage. You cannot boot from storage, but you
 can mount it.
 
-- Object Storage: It is a flat collection of objects. An object can be anything
+- Object Storage (S3): It is a flat collection of objects. An object can be anything
 with or without attached metadata. To retrieve the object, you need to provide
 the key and then the value will be returned. This is not mountable or
 bootable. It scales very well and can have simultaneous access.
@@ -2486,12 +2486,10 @@ available immediately.
   - If you attempt to read data that hasn't been restored yet, it will
   immediately pull it from S3, but this will achieve lower levels of performance
   than reading from EBS directly.
-  - You can force a read of every block all data immediately using DD.
+  - You can force a read of every block of data immediately using `dd` (linux command).
 
 Fast Snapshot Restore (FSR) allows for immediate restoration.
-You can create 50 of these FSRs per region. When you enable it on
-a snapshot, you pick the snapshot specifically and the AZ that you want to be
-able to do instant restores to. Each combination of Snapshot and AZ counts
+You can create 50 of these FSRs per region. When you enable it on a snapshot, you pick the snapshot specifically and the AZ that you want to be able to do instant restores to. Each combination of Snapshot and AZ counts
 as one FSR set. You can have 50 FSR sets per region.
 FSR is not free and can get expensive with lost of different snapshots.
 
@@ -2504,8 +2502,7 @@ This is used data, not allocated data. If you have a 40 GB volume but only
 use 10 GB, you will only be charged for the allocated data.
 This is not how EBS itself works.
 
-The data is incrementally stored which means doing a snapshot every 5 minutes
-will not necessarily increase the charge as opposed to doing one every hour.
+The data is incrementally stored which means doing a snapshot every 5 minutes will not necessarily increase the charge as opposed to doing one every hour.
 
 #### 1.6.8.3. EBS Encryption
 
@@ -2519,10 +2516,7 @@ When you set up an EBS volume initially, EBS uses KMS and a customer master key.
 This can be the EBS default (CMK) which is referred to as `aws/ebs` or it
 could be a customer managed CMK which you manage yourself.
 
-That key is used by EBS when an encrypted volume is created. The CMK
-generates an encrypted **data encryption key (DEK)** which is stored with the volume with
-on the physical disk. This key can only be decrypted using KMS when a role with
-the proper permissions to decrypt that DEK.
+That key is used by EBS when an encrypted volume is created. The CMK generates an encrypted **data encryption key (DEK)** which is stored with the volume with on the physical disk. This key can only be decrypted using KMS with a role with the proper permissions to decrypt that DEK.
 
 When the volume is first used, EBS asks CMS to decrypt the key and stores
 the decrypted key in memory on the EC2 host while it's being used. At all
@@ -2558,13 +2552,11 @@ data encryption key.
   - This occurs between the EC2 host and the EBS system itself.
   - The OS does not see any encryption. It simply writes data out and reads
   data in from a disk.
-  - If an exam question does not use AES256, or it suggests you need an OS to
-encrypt or hold the keys, then you need to perform full disk encryption
-at the operating system level.
+  - If an exam question does not use AES256, or it suggests you need an OS to encrypt or hold the keys, then you need to perform full disk encryption at the operating system level.
 
 ### 1.6.9. EC2 Network Interfaces, Instance IPs and DNS
 
-An EC2 instance starts with at least one ENI - elastic network interface.
+An EC2 instance starts with at least one ENI - Elastic Network Interface.
 An instance may have ENIs in separate subnets, but everything must be
 within one AZ.
 
@@ -2579,51 +2571,31 @@ Has these properties
 - Primary IPv4 private address
   - From the range of the subnet the ENI is within.
   - Will be static and not change for the lifetime of the instance
-    - `10.16.0.10`
+    - e.g. `10.16.0.10`
   - Given a DNS name that is associated with the address.
     - `ip-10-16-0-10.ec2.internal`
     - Only resolvable inside the VPC and always points at private IP address
 - 0 or more secondary private IP addresses
 - 0 or 1 public IPv4 address
-  - The instance must manually be set to receive an IPv4 address or spun into a
-subnet which automatically allocates an IPv4.
-This is a dynamic IP that is not fixed.
-If you stop an instance the address is removed.
-When you start up again, it is given a brand new IPv4 address.
-Restarting the instance will not change the IP address.
-Changing between EC2 hosts will change the address.
-This will be allocated a public DNS name. The Public DNS name will resolve to
-the primary private IPv4 address of the instance.
-Outside of the VPC, the DNS will resolve to the public IP address.
-This allows one single DNS name for an instance, and allows traffic to resolve
-to an internal address inside the VPC and the public will resolve to a public
-IP address.
+  - The instance must manually be set to receive an IPv4 address or launched into a subnet which automatically allocates an IPv4.
+  - This is a dynamic IP that is not fixed. If you stop an instance the address is removed. When you start up again, it is given a brand new IPv4 address. Restarting the instance will not change the IP address. Changing between EC2 hosts will change the address. This will be allocated a public DNS name. The Public DNS name will resolve to the primary private IPv4 address of the instance. Outside of the VPC, the DNS will resolve to the public IP address. This allows one single DNS name for an instance, and allows traffic to resolve to an internal address inside the VPC and the public will resolve to a public IP address.
 - 1 elastic IP per private IPv4 address
-  - Can have 1 public elastic interface per private IP address on this interface.
-This is allocated to your AWS account.
-Can associate with a private IP on the primary interface or secondary interface.
-If you are using a public IPv4 and assign an elastic IP, the original IPv4
-address will be lost. There is no way to recover the original address.
+  - Can have 1 public elastic interface per private IP address on this interface. This is allocated to your AWS account. Can associate with a private IP on the primary interface or secondary interface. If you are using a public IPv4 and assign an elastic IP, the original IPv4 address will be lost. There is no way to recover the original address.
 - 0 or more IPv6 address on the interface
   - These are by default public addresses.
 - Security groups
   - Applied to network interfaces.
   - Will impact all IP addresses on that interface.
-  - If you need different IP addresses impacted by different security
-  groups, then you need to make multiple interfaces and apply different
-  security groups to those interfaces.
+  - If you need different IP addresses impacted by different security groups, then you need to make multiple interfaces and apply different security groups to those interfaces.
 - Source / destination checks
-  - If traffic is on the interface, it will be discarded if it is not
-  from going to or coming from one of the IP addresses
+  - If traffic is on the interface, it will be discarded if it is not going to or coming from one of the IP addresses
 
-Secondary interfaces function in all the same ways as primary interfaces except
-you can detach interfaces and move them to other EC2 instances.
+Secondary interfaces function in all the same ways as primary interfaces except you can detach interfaces and move them to other EC2 instances.
 
 #### 1.6.9.2. ENI Exam PowerUp
 
 - Legacy software is licensed using a mac address.
-  - If you provision a secondary ENI to a specific license, you can move
-around the license to different EC2 instances.
+  - If you provision a secondary ENI to a specific license, you can move around the license to different EC2 instances.
 - Multi homed (subnets) management and data.
 - Different security groups are attached to different interfaces.
 - The OS doesn't see the IPv4 public address.
