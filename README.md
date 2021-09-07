@@ -2643,8 +2643,7 @@ Images of EC2 instances that can launch more EC2 instance.
         snapshots, a device ID that the original volumes had on the EC2
         instance.
 
-4. Launch: When launching an instance, the snapshots are used to create new EBS
-volumes in the AZ of the EC2 instance and contain the same block device mapping.
+4. Launch: When launching an instance, the snapshots are used to create new EBS volumes in the AZ of the EC2 instance and contain the same block device mapping.
 
 #### 1.6.10.2. AMI Exam PowerUps
 
@@ -2665,7 +2664,7 @@ make changes, then make new AMI
   - Depends on the OS
 - Default pricing model
 - No long-term commitments or upfront payments
-- New or uncertain application requirements
+- Best for new or uncertain application requirements
 - Short-term, spiky, or unpredictable workloads which can't tolerate disruption.
 
 #### 1.6.11.2. Spot Instances
@@ -2694,7 +2693,7 @@ Reserved in region, or AZ with capacity reservation.
 Reserved instances takes priority for AZ capacity.
 Can perform scheduled reservation when you can commit to specific time windows.
 
-Great if you have a known stead state usage, email usage, domain server.
+Great if you have a known steady-state usage, email usage, domain server.
 Cheapest option with no tolerance for disruption.
 
 ### 1.6.12. Instance Status Checks and Autorecovery
@@ -2702,8 +2701,7 @@ Cheapest option with no tolerance for disruption.
 Every instance has two high level status checks
 
 - System Status Checks
-  - Failure of this check could indicate SW or HW problems of the EC2
-service or the host.
+  - Failure of this check could indicate SW or HW problems of the EC2 service or the host.
 - Instance Status Checks
   - Specific to the file system or has a corrupted Kernel.
 
@@ -2732,8 +2730,7 @@ The server can increase in capacity, but this will require a reboot.
 #### 1.6.13.2. Horizontal Scaling
 
 As the customer load increases, this adds additional capacity.
-Instead of one running copy of an application, you can have multiple versions
-running on each server.
+Instead of one running copy of an application, you can have multiple versions running on each server.
 This requires a load balancer.
 
 > A load balancer is an _appliance_ that sits in between your servers -- in this case instances -- and your customers.
@@ -2746,14 +2743,14 @@ servers get equal parts of the load.
 - With horizontal scaling you can shift between instances equally.
 - This requires either *application support* or *off-host* sessions.
   - If you use off-host sessions, then your session data is stored in another place, an external database.
-  - This means that the servers are what's called **stateless**, they are just dump instances of your application.
-  - The application does care which instance you are connected to because your session is externally hosted somewhere else.
+  - This means that the servers are what's called **stateless**, they are just dumb instances of your application.
+  - The application doesn't care which instance you are connected to because your session is externally hosted.
 
 #### 1.6.13.3. Benefits of Horizontal Scaling
 
 - No disruption while scaling up or down.
 - No real limits to scaling.
-- Uses smaller instances is less expensive.
+- Uses smaller instances -> less expensive.
 - Allows for better granularity.
 
 ### 1.6.14. Instance Metadata
@@ -2781,8 +2778,7 @@ Virtualization Problems
 
 Using an EC2 virtual machine with Nitro Hypervisor, 4 GB ram, and 40 GB disk,
 the OS can consume 60-70% of the disk and much of the available memory.
-Containers leverage the similarities of multiple guest OS by removing duplicate
-resources. This allows applications to run in their own isolated environments.
+Containers leverage the similarities of multiple guest OS by removing duplicate resources. This allows applications to run in their own isolated environments.
 
 #### 1.7.1.1. Image Anatomy
 
@@ -2795,16 +2791,16 @@ Images contain read only layers, images are layer onto images.
 
 ##### 1.7.1.1.1. What are images used for
 
-1. A docker image is actually how we create a docker container. In fact a ocker container is just a running copy of a docker image with one crucial difference: a docker container has an additional *read/write* file system layer. File system layers --  the layers that make up the docker image -- by default are _read_ only; they never change after they are created. And so, the special read/write layer is added which allows containers to run. If you have lots of containers with very similar base structures, they will share the parts that overlap. The other layers are reused between containers.
+1. A docker image is actually how we create a docker container. In fact a docker container is just a running copy of a docker image with one crucial difference: a docker container has an additional *read/write* file system layer. File system layers --  the layers that make up the docker image -- by default are _read_ only; they never change after they are created. And so, the special read/write layer is added which allows containers to run. If you have lots of containers with very similar base structures, they will share the parts that overlap. The other layers are reused between containers.
 
-2. The reuse architecture that is offered by the way containers do their disk images scales really well. Disk space when you have lots of containers is minimized because of this layered architecture. The base layer -- the OS -- they are generally made available by the OS vendors through something called a _container registry_ and a popular one is _docker hub_.
+2. The reuse architecture that is offered by the way containers do their disk images scales really well. Disk space when you have lots of containers is minimized because of this layered architecture. The base layer (OS) is generally made available by the OS vendors through something called a _container registry_ and a popular one is _docker hub_.
 
 #### 1.7.1.2. Container Registry
 
 A container registry or hub is a hub of container images. As a developer or solution architect, you use a dockerfile to create a container image. Then you upload that image to a private/public repository such as the docker hub. In the case of a public hub, other people will likely do the same including vendors of the base OS such as the CentOS example shown above. From there, these container images can then be deployed to docker hosts, which are just services running a container engine (e.g. docker).
 
-A docker host can run many containers based on or more images. A single image can be to generate containers on many docker hosts.
-Dockerfile can create a container image where it gets stored
+A docker host can run many containers based on or more images. A single image can be used to generate containers on many docker hosts.
+A Dockerfile can create a container image where it gets stored
 in the container registry.
 
 #### 1.7.1.3. Container Key Concepts
@@ -2822,7 +2818,7 @@ in the container registry.
 
 - Accepts containers and instructions you provide. It orchestrates where and how to run the containers. It is a managed container-based compute service.
 
-ECS runs into two modes: 1. Using EC2; 2. Using Fargate.
+ECS runs in two modes: 1. Using EC2; 2. Using Fargate.
 
 - ECS allows you to create a cluster.
   - Clusters are where containers run from.
@@ -2834,7 +2830,7 @@ ECS runs into two modes: 1. Using EC2; 2. Using Fargate.
 - **Task definitions** store the resources used by the task.
   - It also stores the **task role**, an IAM role that allows the task access to other AWS resources.
 
-> Task roles are the best practice way for giving containers within ECS permissions to access AWS products and services.
+> Task roles are the best practice way of giving containers within ECS permissions to access AWS products and services.
 
 - Task does not scale on its own and it is not highly available.
 
