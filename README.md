@@ -3057,16 +3057,16 @@ parameter store.
 
 CloudWatch and CloudWatch Logs cannot natively capture data inside an instance.
 
-CloudWatch Agent is required for OS visible data. It sends this data into CW
-For CW to function, it needs configuration and permissions in addition
-to having the CW agent installed.
+CloudWatch Agent is required for OS visible data. It sends this data into CW.
+
+For CW to function, it needs configuration and permissions in addition to having the CW agent installed.
 The CW agent needs to know what information to inject into CW and CW Logs.
 
 The agent also needs some permissions to interact with AWS.
 This is done with an IAM role as best practice.
 The IAM role has permissions to interact with CW logs.
-The IAM role is attached to the instance which provides the instance and
-anything running on the instance, permissions to manage CW logs.
+
+The IAM role is attached to the instance which provides the instance and anything running on the instance, permissions to manage CW logs.
 
 The data requested is then injected in CW logs.
 There is one log group for each individual log we want to capture.
@@ -3083,8 +3083,7 @@ Designed so that instances within the same cluster are physically close together
 
 Achieves the highest level of performance possible inside EC2.
 
-Best practice is to launch all of the instances within that group at the
-same time.
+Best practice is to launch all of the instances within that group at the same time.
 If you launch with 9 instances and AWS places you in a place with capacity
 for 12, you are now limited in how many you can add.
 
@@ -3115,8 +3114,7 @@ Keep instances separated
 This provides the best resilience and availability.
 Spread groups can span multiple AZs. Information will be put on distinct
 racks with their own network or power supply. There is a limit of 7 instances
-per AZ. The more AZs in a region, the more instances inside a spread placement
-group.
+per AZ. The more AZs in a region, the more instances inside a spread placement group.
 
 ##### 1.8.6.2.1. Spread Placement Exam PowerUp
 
@@ -3125,8 +3123,7 @@ group.
 - **7 instances per AZ is a hard limit**.
 - Not supported for dedicated instances or hosts.
 
-- Use case: small number of critical instances that need to be kept separated
-from each other. Several mirrors of an application; different nodes of an application; etc.
+- Use case: small number of critical instances that need to be kept separated from each other. Several mirrors of an application; different nodes of an application; etc.
 
 #### 1.8.6.3. Partition Placement -> Groups of Instances Spread Apart
 
@@ -3172,7 +3169,7 @@ matching host size.
 
 ### 1.8.8. Enhanced Networking
 
-Enhanced networking uses SR-IOV.
+Enhanced networking uses SR-IOV (single root I/O virtualization).
 The physical network interface is aware of the virtualization.
 Each instance is given exclusive access to one part of a physical network
 interface card.
@@ -3200,8 +3197,7 @@ Most new instances support this and have this enabled by default for no charge.
 
 A hosted zone is a DNS database for a given section of global DNS data.
 A public hosted zone is a type of R53 hosted zone which is hosted on
-R53 provided public DNS name servers. When creating a hosted zone, AWS provides
-at least 4 DNS name servers which host the zone.
+R53 provided public DNS name servers. When creating a hosted zone, AWS provides at least 4 DNS name servers which host the zone.
 
 This is globally resilient service due to multiple DNS servers.
 
@@ -3214,24 +3210,18 @@ registered domain at that zone.
 There is a monthly fee to host each hosted zone within R53 and a fee for
 any queries made to that service.
 
-Hosted Zones are what the DNS system references via delegation and name server
-records. A hosted zone, when referenced in this way by the DNS system, is known
-as being authoritative for a domain.
+Hosted Zones are what the DNS system references via delegation and name server records. A hosted zone, when referenced in this way by the DNS system, is known as being authoritative for a domain.
 It becomes the single source of truth for a domain.
 
-VPC instances are already configured (if enabled) with the VPC +2 address as their
-DNS resolver - this allows querying of R53 public and internet hosted DNS zones from
-instances within that VPC.
+VPC instances are already configured (if enabled) with the VPC +2 address as their DNS resolver - this allows querying of R53 public and internet hosted DNS zones from instances within that VPC.
 
 ### 1.9.2. Private Hosted Zones
 
 Same as public hosted zones except these are not public.
 They are associated with VPCs and are only accesible within those VPCs via the R53 resolver.
 
-It's possible to use a technique called Split-view for public and internal use with the same
-zone name. A common architecure is to make the public hosted zone a subset of the private hosted zone
-containing only those records that are meant to be accessed from the Internet, while inside VPCs
-associated with the private hosted zone all resource records can be accessed.
+It's possible to use a technique called Split-view for public and internal use with the same zone name. A common architecure is to make the public hosted zone a subset of the private hosted zone
+containing only those records that are meant to be accessed from the Internet, while inside VPCs associated with the private hosted zone all resource records can be accessed.
 
 ### 1.9.2. Route 53 Health Checks
 
@@ -3248,17 +3238,13 @@ These are performed by a fleet of global health checkers. If you think
 they are bots and block them, this could cause alarms.
 
 Checks occur every 30 seconds by default. This can be increased to 10 seconds
-for additional costs. These checks are per health checker. Since there are many
-you will automatically get one every few seconds. The 10 second option will
-complete multiple checks per second.
+for additional costs. These checks are per health checker. Since there are many you will automatically get one every few seconds. The 10 second option will complete multiple checks per second.
 
-There could be one of three checks
+There could be one of three checks:
 
 - TCP checks: R53 tries to establish TCP with end point within 10 (fast) or 30 seconds (standard).
-- HTTP/HTTPS: Same as TCP but within 4 seconds. The end point must respond
-with a 200 or 300 status code within 3 seconds of checking.
-- HTTP/HTTPS String matching: Same as above, the body must have a string within the first
-5120 bytes. This is chosen by the user.
+- HTTP/HTTPS: Same as TCP but within 4 seconds. The end point must respond with a 200 or 300 status code within 3 seconds of checking.
+- HTTP/HTTPS String matching: Same as above, the body must have a string within the first 5120 bytes. This is chosen by the user.
 
 It will be deemed healthy or unhealthy.
 
