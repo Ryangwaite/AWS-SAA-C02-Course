@@ -3257,7 +3257,7 @@ There are three types of checks.
 ### 1.9.3. Route 53 Routing Policies Examples
 
 - **Simple**: Route traffic to a single resource. Client queries the resolver
-which has one record. It will respond with 3 values and these get forwarded
+which has one record. It can have multiple values in a record e.g. It could respond with 3 values and these get forwarded
 back to the client. The client then picks one of the three at random.
 This is a single record only. No health checks.
 
@@ -3393,8 +3393,7 @@ The data is the same, but it's grouped together on disk, based on
 column so every order value is stored together, every product item, color,
 size, and price are all grouped together.
 
-This is bad for transactional style processing, but great for reporting or when
-all values for a specific size are required.
+This is bad for transactional style processing, but great for reporting or when all values for a specific size are required.
 
 ##### 1.10.1.2.6. Graph
 
@@ -3428,7 +3427,6 @@ It is always a bad idea to do this.
 - Advanced DB Option tuning (DBROOT)
   - AWS provides options to tune many of these parameters anyways.
   - Can be a vendor that is asking for this.
-- DB or DB version that AWS doesn't provide.
 - You might need a specific version of an OS and DB that AWS doesn't provide.
 
 #### 1.10.2.2. Reasons why you really shouldn't run a database on EC2
@@ -3457,11 +3455,9 @@ Runs one of a few types of database engines and can contain multiple
 user created databases. Create one when you provision the instance, but
 multiple ones can be created after.
 
-When you create a database instance, the way you access it is using a database
-host-name, a CNAME, and this resolves to the database instance itself.
+When you create a database instance, the way you access it is using a database host-name, a CNAME, and this resolves to the database instance itself.
 
-RDS uses standard database engines so you can access an RDS instance using the
-same tooling as if you were accessing a self-managed database.
+RDS uses standard database engines so you can access an RDS instance using the same tooling as if you were accessing a self-managed database.
 
 The database can be optimized for:
 
@@ -3518,7 +3514,7 @@ This does not provide fault tolerance as there will be some impact during change
 - The standby replica cannot be accessed directly unless a fail occurs.
    - Can't be used for scaling. It's an availability improvement not performance one.
 - Failover is highly available, not fault tolerant.
-- Offers only high availability and minimizes disruptions associated with software updates, backups, and instance type changes not performance improvement or scalability. (Don't for exam questions that try to trick you into choosing options that say Multi-AZ can improve performance.)
+- Offers only high availability and minimizes disruptions associated with software updates, backups, and instance type changes not performance improvement or scalability. (**Don't fall for exam questions that try to trick you into choosing options that say Multi-AZ can improve performance.**)
 - Same region only (others AZ in the VPC).
 - Backups are taken from standby which removes performance impacts.
 - Failover can happen for a number of reasons.
@@ -3548,17 +3544,12 @@ First snap is full copy of the data used on the RDS volume. From then on,
 the snapshots are incremental and only store the change in data.
 
 When any snapshot occurs, there's a brief interruption to the flow of data
-between the compute resource and the storage. If you are using single AZ, this
-can impact your application. If you are using Multi-AZ, the snapshot occurs
-on the standby replica.
+between the compute resource and the storage. If you are using single AZ, this can impact your application. If you are using Multi-AZ, the snapshot occurs on the standby replica.
 
 **Manual snapshots don't expire**, you have to clean them yourself.
 Automatic Snapshots can be configured to make things easier.
 
-In addition to automated backup, every 5 minutes database transaction logs are
-saved to S3. Transaction logs store the actual data which changes inside a
-database so the actual operations that are executed. This allows a database
-to be restored to a point in time often with 5 minute granularity.
+In addition to automated backup, every 5 minutes database transaction logs are saved to S3. Transaction logs store the actual data which changes inside a database so the actual operations that are executed. This allows a database to be restored to a point in time often with 5 minute granularity.
 
 Automatic cleanups can be anywhere from *0 to 35* days.
 This means you can restore to any point in that time frame.
@@ -3573,11 +3564,9 @@ expire automatically.
 #### 1.10.5.1. RDS Backup Exam PowerUp
 
 - When performing a restore, RDS creates a new RDS with a new endpoint address.
-- When restoring a manual snapshot, you are setting it to a single point
-in time. This influences the RPO value.
+- When restoring a manual snapshot, you are setting it to a single point in time. This influences the RPO value.
 - Automated backups are different, they allow any 5 minute point in time.
-- Backups are restored and transaction logs are replayed to bring DB to
-desired point in time.
+- Backups are restored and transaction logs are replayed to bring DB to desired point in time.
 - Restores aren't fast, think about RTO.
 
 ### 1.10.6. RDS Read-Replicas
@@ -3637,10 +3626,10 @@ It uses a **cluster** which is:
   - Improved availability.
   - Better performance.
 
-Aurora cluster functions across a number of availability zones.
+Aurora clusters functions across a number of AZ's.
 
 There is a primary instance and a number of replicas.
-The read applications from applications can use the replicas.
+The read operations from applications can use the replicas.
 
 There is a shared storage of **max 64 TiB** across all replicas.
 This uses 6 copies across AZs.
@@ -3661,7 +3650,7 @@ can be a failover target. The failover operation will be quicker because
 it doesn't have to make any storage modifications.
 
 - Cluster shared volume is based on SSD storage by default.
-  - Provides so high IOPS and low latency.
+  - Provides super high IOPS and low latency.
   - No way to select magnetic storage.
 - Aurora cluster does not specify the amount of storage needed.
   - This is based on what is consumed.
@@ -3669,8 +3658,7 @@ it doesn't have to make any storage modifications.
   - Storage which is freed up can be re-used.
   - If you reduce a lot of storage, you will need to create a brand new
   cluster and migrate data from the old cluster to the new cluster.
-- Storage is for the cluster and not the instances which means Replicas can be
-added and removed without requiring storage, provisioning, or removal.
+- Storage is for the cluster and not the instances which means Replicas can be added and removed without requiring storage, provisioning, or removal.
 
 #### 1.10.8.1. Aurora Endpoints
 
@@ -3704,8 +3692,7 @@ Minimum endpoints
 Backups in Aurora work in the same way as RDS.
 Restores create a brand new cluster.
 
-Backtrack must be enabled on a per cluster basis. This allows you to roll back
-your data base to a previous point in time. This helps for data corruption.
+Backtrack must be enabled on a per cluster basis. This allows you to roll back your DB to a previous point in time. This helps for data corruption.
 
 You can adjust the window backtrack will work for.
 
