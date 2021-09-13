@@ -3799,7 +3799,7 @@ Full load migration is a one off process which transfers everything at once.
 This requires the database to be down during this process. This might
 take several days.
 
-Instead Full Load + CDC allows for a full load transfer to occur and it
+Instead Full Load + CDC (change data capture) allows for a full load transfer to occur and it
 monitors any changes that happens during this time. Any of the captured
 changes can be applied to the target.
 
@@ -3846,8 +3846,7 @@ You can use hybrid networking to connect to the same mount targets.
 - Two performance modes:
   - **General purpose** is good for _latency sensitive_ use cases.
     - General purpose should be default for 99.9% of uses.
-  - **Max I/O performance** mode can scale to higher levels of aggregate t-put
-  and IOPS but it does have increased latencies.
+  - **Max I/O performance** mode can scale to higher levels of aggregate t-put and IOPS but it does have increased latencies.
 - Two throughput modes:
   - Bursting works like GP2 volumes inside EBS with a burst pool.
   The more data you store in the FS, the better performance you get.
@@ -3876,7 +3875,7 @@ Without load balancing, this could bring additional problems.
 
 #### 1.12.1.1. Load Balancers Architecture
 
-The user connects to a load balancer that is set to listens on port 80 and 443.
+The user connects to a load balancer that is set to listen on port 80 and 443.
 
 Within AWS, the configuration for which ports the load balancer listens on is
 called a **listener**.
@@ -3944,8 +3943,7 @@ to direct traffic to different Target Groups based on their DNS.
 
 #### 1.12.2.2. ALB Exam PowerUp
 
-- Targets are one single compute resource that connections are directed
-towards. Targets represents Lambda functions, EC2 instances, ECS containers.
+- Targets are one single compute resource that connections are directed towards. Targets can be Lambda functions, EC2 instances, ECS containers.
 - Target groups are groups of targets which are addressed using rules.
 - Rules are:
   - path-based `/cat` or `/dog`
@@ -3963,7 +3961,7 @@ They are documents which allow you to define the configuration of an EC2 instanc
 
 They allow you to configure:
 
-- AMIs to use; Instance Type; Storate and Key Pairs.
+- AMIs to use; Instance Type; Storage and Key Pairs.
 - Networking and Security Groups
 - Userdata & IAM Role
 
@@ -4001,7 +3999,7 @@ There are three types of scaling policies:
 
 - Simple: If CPU is above 50%, add one to capacity
 - Stepped: If CPU usage is above 50%, add one, if above 80% add three
-- Target: Desired aggregate CPU = 40%, ASG will achieve this
+- Target: Desired aggregate CPU = 40%, auto-scaling-group will achieve this.
 
 **Cooldown Period** is how long to wait at the end of a scaling action before
 scaling again. There is a minimum billable duration for an EC2 instance.
@@ -4011,7 +4009,7 @@ Self healing occurs when an instance has failed and AWS provisions a new
 instance in its place. This will fix most problems that are isolated to one
 instance.
 
-AGS can use the load balancer health checks rather than EC2.
+ASG can use the load balancer health checks rather than EC2.
 ALB status checks can be much richer than EC2 checks because they can monitor
 the status of HTTP and HTTPS requests. This makes them more application aware.
 
@@ -4019,7 +4017,7 @@ the status of HTTP and HTTPS requests. This makes them more application aware.
 - Always use cool downs to avoid rapid scaling.
 - Think about implementing more and smaller instances to allow granularity.
 - Generally, for anything client-facing you should always use Auto Scaling Groups (ASG) with Application Load Balancers (ALB) with autoscaling because they allow you to provide elasticity by abstracting the user away from individual servers. Since, the customers will be connecting through an ALB, they don't have any visibility of individual servers.
-- ASG defines WHEN and WHERE; Launch Templates defines WHAT.
+- **ASG defines WHEN and WHERE; Launch Templates defines WHAT.**
 
 ### 1.12.5. Network Load Balancer (NLB)
 
@@ -4037,17 +4035,14 @@ There is 1 interface per AZ. Can also use Elastic IPs (whitelisting on firewalls
 
 5. Can perform SSL pass through.
 
-6. NLB can load balance non-HTTP/S applications, doesn't care about anything
-above TCP/UDP. This means it can handle load balancing for FTP or things
-that aren't HTTP or HTTPS.
+6. NLB can load balance non-HTTP/S applications, doesn't care about anything above TCP/UDP. This means it can handle load balancing for FTP or things that aren't HTTP or HTTPS.
 
 ### 1.12.6. SSL Offload and Session Stickiness
 
 #### 1.12.6.1. Bridging - Default mode
 
 One or more clients makes one or more connections to a load balancer.
-The load balancer is configured so its **listener** uses HTTPS, SSL connections
-occur between the client and the load balancer.
+The load balancer is configured so its **listener** uses HTTPS, SSL connections occur between the client and the load balancer.
 
 The load balancer then needs an SSL certificate that matches the domain name
 that the application uses. AWS has access to this certificate.
@@ -4073,14 +4068,11 @@ protocol.
 
 #### 1.12.6.2. Pass-through - Network Load Balancer
 
-The client connects, but the load balancer passes the connection along without
-decrypting the data at all. The instances still need the SSL certificates,
+The client connects, but the load balancer passes the connection along without decrypting the data at all. The instances still need the SSL certificates,
 but the load balancer does not. Specifically it's a network load balancer
 which is able to perform this style of connection.
 
-The load balancer is configured for TCP, it can see the source or destinations,
-but it never touches the encrypted connection. The certificate never
-needs to be seen by AWS.
+The load balancer is configured for TCP, it can see the source or destinations, but it never touches the encrypted connection. The certificate never needs to be seen by AWS.
 
 Negative is you don't get any load balancing based on the HTTP part
 because that is never exposed to the load balancer. The EC2 instances
@@ -4091,7 +4083,7 @@ still need the compute cryptographic overhead.
 Clients connect to the load balancer using HTTPS and are terminated on the
 load balancer. The LB needs an SSL certificate to decrypt the data, but
 on the backend the data is sent via HTTP. While there is a certificate
-required on the load balancer, this is not needed on the LB.
+required on the load balancer, this is not needed on the backend instances.
 
 Data is in plaintext form across AWS's network. Not a problem for most.
 
@@ -4113,8 +4105,7 @@ is between one second and seven days. For this time, sessions will be sent to
 the same backend instance. This will happen until:
 
 - A server failure, then the user will be moved to a different server.
-- The cookie expires, the whole process will repeat and will receive a
-new cookie
+- The cookie expires, the whole process will repeat and will receive a new cookie
 
 This could cause backend unevenness because one user will always be forced
 to the same server no matter what the distributed load is. Applications
@@ -4146,11 +4137,9 @@ This is the least cost effective way to architect systems.
 - Can adjust the size of the server that is running each application tier.
 - Utilizes load balancers in between tiers to add capacity.
 - Tiers are still tightly coupled.
-  - Tiers expect a response from each other. If one tier fails, subsequent
-  tiers will also fail because they will not receive the proper response.
+  - Tiers expect a response from each other. If one tier fails, subsequent tiers will also fail because they will not receive the proper response.
   - Back loads in one tier will impact the other tiers and customer experience.
-- Tiers must be operational and send responses even if they are not processing
-anything of value otherwise the system fails.
+- Tiers must be operational and send responses even if they are not processing anything of value otherwise the system fails.
 
 #### 1.13.1.3. Evolving with Queues
 
@@ -4163,12 +4152,11 @@ anything of value otherwise the system fails.
   - The upload tier can add more messages to the queue.
 - The queue will have an autoscaling group to increase processing capacity.
 - The autoscaling group will only bring up servers as they are needed.
-- The queue has the location of the S3 bucket and passes this onto the
-processing tier.
+- The queue has the location of the S3 bucket and passes this onto the processing tier.
 
 #### 1.13.1.4. Microservices Architecture
 
-A collection of microservices. Microservices are tiny, self sufficient application. It has its own logic; its own store of data; and its own input/output components. Microservices do individual things very well. In this example you have the upload microservice, process microservice, and the store and manage microservice. The upload process is a **producer**; the processing process is a **consumer**; and the store and manage process does both. Logically, producers produce data or messages; consumers consume data or messages; and then there are microservices that can do both things. Now the things that services produce or consume architecturally are events. Queues can be used to communicate events.
+A collection of microservices. Microservices are tiny, self sufficient application. It has its own logic, store of data; and input/output components. Microservices do individual things very well. In this example you have the upload microservice, process microservice, and the store and manage microservice. The upload process is a **producer**; the processing process is a **consumer**; and the store and manage process does both. Logically, producers produce data or messages; consumers consume data or messages; and then there are microservices that can do both things. Now the things that services produce or consume architecturally are events. Queues can be used to communicate events.
 
 #### 1.13.1.5. Event Driven Architecture
 
