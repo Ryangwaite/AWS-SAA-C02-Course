@@ -4160,9 +4160,9 @@ A collection of microservices. Microservices are tiny, self sufficient applicati
 
 #### 1.13.1.5. Event Driven Architecture
 
-Event-driven architecture are just collection of event producers which might be components of your application which directly interacts with customers. Or, they might be part of your infrastructure such as EC2; or they might be system-monitoring components. They are pieces of software which generate or produce events in reaction to something. If a customer click submit, that might be an event. If an error occurs while packing a customer order, that is another event.
+Event-driven architecture are just collection of event producers which might be components of your application which directly interacts with customers. Or, they might be part of your infrastructure such as EC2; or they might be system-monitoring components. They are pieces of software which generate or produce events in reaction to something. If a customer clicks submit, that might be an event. If an error occurs while packing a customer order, that is another event.
 
-Event consumers are pieces of software which are ready and waiting for events to occur. If they see an event they care about they will do something to that event. They will take an action. It might displaying something for a customer or despatching a human to resolve an order-packing issue or it might be to retry an upload.
+Event consumers are pieces of software which are ready and waiting for events to occur. If they see an event they care about they will do something to that event. They will take an action. It might display something for a customer or dispatch a human to resolve an order-packing issue or it might be to retry an upload.
 
 Components within an architecture can be producers and consumers. Sometimes a component can generate an event, for example, a failed upload and then consume events to force a retry of that upload.
 
@@ -4186,8 +4186,7 @@ A mature event-driven architecuture only consumes resources while handling event
   - Actions are taken and the system returns to waiting
 - Services can be producers and consumers at once.
 - Resources are not waiting around to be used.
-- Event router is needed for event driven architecture that also manages
-an event bus.
+- Event router is needed for event driven architecture that also manages an event bus.
 - Only consumes resources while handling events.
 
 ### 1.13.2. AWS Lambda
@@ -4197,7 +4196,7 @@ an event bus.
 - Event driven invocation (execution) based on an event occurring.
 - **Lambda function** is piece of code in one language.
 - Lambda functions use a **runtime** (e.g. Python 3.6)
-- Runs in a **runtime environment**.
+- Runs in a **runtime environment** which is:
   - Virtual environment that is ready to go to run code in that language. Think of it as a _container_.
   - You are billed only for the duration a function runs.
   - There is no charge for having lambda functions waiting and ready to go.
@@ -4206,11 +4205,9 @@ an event bus.
 
 Best practice is to make it very small and very specialized.
 Lambda function code, when executed is known as being **invoked**.
-When invoked, it runs inside a runtime environment that matches the language the
-script is written in.
+When invoked, it runs inside a runtime environment that matches the language the script is written in.
 The runtime environment is allocated a certain amount of memory and an
-appropriate amount of CPU. The more memory you allocate, the more CPU it gets,
-and the more the function costs to invoke per second.
+appropriate amount of CPU. The more memory you allocate, the more CPU it gets, and the more the function costs to invoke per second.
 
 Lambda functions can be given an IAM role or **execution role**.
 The execution role is passed into the runtime environment.
@@ -4222,17 +4219,12 @@ Each time you invoke a lambda function, the environment provided is new.
 Never store anything inside the runtime environment, it is ephemeral.
 
 Lambda functions by default are public services and can access any websites.
-By default they cannot access private VPC resources, but can be configured
-to do so if needed. Once configured, they can only access resources within a VPC.
-Unless you have configured your VPC to have all of the configuration needed
-to have public internet access or access to the AWS public space endpoints, then
-the Lambda will not have access.
+By default they cannot access private VPC resources, but can be configured to do so if needed. Once configured, they can only access resources within a VPC.
+Unless you have configured your VPC to have all of the configuration needed to have public internet access or access to the AWS public space endpoints, then the Lambda will not have access.
 
-The Lambda runtime is stateless, so you should always use AWS services for input
-and output. Something like DynamoDB or S3. If a Lambda is invoked by an event,
-it gets details of the event given to it at startup.
+The Lambda runtime is stateless, so you should always use AWS services for input and output. Something like DynamoDB or S3. If a Lambda is invoked by an event, it gets details of the event given to it at startup.
 
-Lambda functions can run up to 15 minutes. That is the max limit.
+Lambda functions can run up to **15 minutes**.
 
 #### 1.13.2.2. Key Considerations
 
@@ -4245,10 +4237,8 @@ Lambda functions can run up to 15 minutes. That is the max limit.
 
 ### 1.13.3. CloudWatch Events and EventBridge
 
-Delivers near real time stream of system events that describe changes in AWS
-products and services. EventBridge will replace CW Events.
-EventBridge can also handle events from third parties. Both share the same
-underlying architecture. AWS is now encouraging a migration to EB.
+Delivers near real time stream of system events that describe changes in AWS products and services. EventBridge will replace CW Events.
+EventBridge can also handle events from third parties. Both share the same underlying architecture. AWS is now encouraging a migration to EB.
 
 #### 1.13.3.1. CloudWatch Events Key Concepts
 
@@ -4258,37 +4248,29 @@ They can observe if X happens at Y time(s), do Z.
 - Y can be a certain time or time period.
 - Z is a supported target service to deliver the event to.
 
-EventBridge is basically CloudWatch Events V2 that uses the same underlying
-APIs and has the same architecture, but with additional features.
+EventBridge is basically CloudWatch Events V2 that uses the same underlying APIs and has the same architecture, but with additional features.
 Things created in one can be visible in the other for now.
 
 Both systems have a default Event bus for a single AWS account.
-A bus is a stream of events which occur for any supported service inside an
-AWS account.
+A bus is a stream of events which occur for any supported service inside an AWS account.
 In CW Events, there is only one bus (implicit), this is not exposed.
-EventBridge can have additional event buses for your applications or third party
-applications and services.
+EventBridge can have additional event buses for your applications or third party applications and services.
 These can be interacted with in the same way as the default bus.
 
-In both services, you create rules and these rules pattern match events which
-occur on the buses and when they see an event which matches, they deliver
-that event to a target. Alternatively you can have schedule based rules
-which match a certain date and time or ranges of dates and times.
+In both services, you create rules and these rules pattern match events which occur on the buses and when they see an event which matches, they deliver that event to a target. Alternatively you can have schedule based rules which match a certain date and time or ranges of dates and times.
 
-Rules match incoming events or schedules. The rule matches an event and routes
-that event to one or more targets as you define on that rule.
+Rules match incoming events or schedules. The rule matches an event and routes that event to one or more targets as you define on that rule.
 
 Architecturally at the heart of event bridge is the default account event bus.
 This is a stream of events generated by supported services within the AWS
 account. Rules are created and these are linked to a specific event bus
-or the default event bus. Once the rule completes pattern matching, the rule
-is executed and moves that event that it matched through to one or more targets.
+or the default event bus. Once the rule completes pattern matching, the rule is executed and moves that event that it matched through to one or more targets.
 The events themselves are JSON structures and the data can be used by the
 targets.
 
 ### 1.13.4. Application Programming Interface (API) Gateway
 
-API stands for Application Programming Interface. It's a way that you can take an application you developed and provide its functionality either directly to users, system utlities, or other applications to include that functionality inside their code. It's a way applications or services can communicate with each other.
+It's a way that you can take an application you developed and provide its functionality either directly to users, system utlities, or other applications to include that functionality inside their code. It's a way applications or services can communicate with each other.
 
 - API gateway is an AWS managed service:
   - Provides managed AWS endpoints.
@@ -4305,8 +4287,7 @@ API stands for Application Programming Interface. It's a way that you can take a
 Great during an architecture evolution because the endpoints don't change.
 
 1. Create a managed API and point at the existing monolithic application.
-2. Using API gateway allows the business to evolve along the way slowly.
-This might move some of the data to fargate and aurora architecture.
+2. Using API gateway allows the business to evolve along the way slowly. This might move some of the data to fargate and aurora architecture.
 3. Move to a full serverless architecture with DynamoDB.
 
 ### 1.13.5. Serverless
@@ -4315,36 +4296,29 @@ This is not one single thing, you manage few if any servers. This aims to remove
 
 These functions are stateless and run in ephemeral environments. Every time they run, they obtain the data that they need, they do something and then optionally, they store the result persistently somehow or deliver the output to something else.
 
-Serverless architecture should use function-as-a-service (FaaS) products such as Lambda for any general processing need. Lambda as a service is billed based on execution duration and functions only run when there a form of execution is happening. Because serverless is event-driven, it means while not being used a serverless architecture should be very close to zero cost until something in that environment generates an event. Serverless architectures generally have no persistent usage of compute within that system.
+Serverless architecture should use function-as-a-service (FaaS) products such as Lambda for any general processing need. Lambda as a service is billed based on execution duration and functions only run when a form of execution is happening. Because serverless is event-driven, it means while not being used, a serverless architecture should be very close to zero cost until something in that environment generates an event. Serverless architectures generally have no persistent usage of compute within that system.
 
 Serverless environments should use, where possible, managed services. It shouldn't re-invent the wheel. Examples include using S3 for any persistent object storage or dynamoDB for any persistent data storage and third party identity providers such as Google, Twitter, Facebook, or even corporate identities such as LDAP & Active Directory instead of building your own. Other services that AWS provides such as Elastic Transcoder can be used to convert media files or manipulate these files in other ways.
 
-Your aim should be to use as-a-Service offerings as much as you can; code as little as possible and use function-as-a-service (FaaS) for any general compute needs. You all of those building blocks together to create your application.
+Your aim should be to use as-a-Service offerings as much as you can; code as little as possible and use function-as-a-service (FaaS) for any general compute needs. You use all of those building blocks together to create your application.
 
 #### 1.13.5.1. Example of Serverless
 
 A user wants to upload videos to a website for transcoding.
 
-1. User browses to a static website that is running the uploader. The JS runs
-directly from the web browser.
+1. User browses to a static website that is running the uploader. The JS runs directly from the web browser.
 2. Third party auth provider, google in this case, authenticates via **token**.
-3. AWS cannot use tokens provided by third parties. **Cognito** is called to
-swap the third party token for AWS credentials.
+3. AWS cannot use tokens provided by third parties. **Cognito** is called to swap the third party token for AWS credentials.
 4. Service uses these temporary credentials to upload a video to S3 bucket.
 5. Bucket will generate an event once it has completed the upload.
-6. A lambda triggers to transcode the video as needed. The
-transcoder will get the original S3 bucket video location and will use
-this for its workload.
-7. Output will be added to a new transcode bucket and will put an entry into
-DynamoDB.
-8. User can interact with another Lambda to pull the media from the
-transcode bucket using the DynamoDB entry.
+6. A lambda triggers to transcode the video as needed. The transcoder will get the original S3 bucket video location and will use this for its workload.
+7. Output will be added to a new transcode bucket and will put an entry into DynamoDB.
+8. User can interact with another Lambda to pull the media from the transcode bucket using the DynamoDB entry.
 
 ### 1.13.6. Simple Notification Service (SNS)
 
 - HA, Durable, PUB/SUB messaging service.
-- Public AWS service meaning to access it, you need network connectivity
-with the Public AWS endpoints. The benefit of this is that it becomes accessible from anywhere that has that network connectivity.
+- Public AWS service meaning to access it, you need network connectivity with the Public AWS endpoints. The benefit of this is that it becomes accessible from anywhere that has that network connectivity.
 - Coordinates sending and delivering of messages: payloads that are up to 256KB in size.
   - Messages are not designed for large binary files.
 - SNS topics are the base entity of SNS.
@@ -4357,8 +4331,7 @@ with the Public AWS endpoints. The benefit of this is that it becomes accessible
   - Filters can be applied to limit messages sent to subscribers.
 - Fanout allows for a single SNS topic with multiple SQS queues as subscribers.
   - Can create multiple related workflows.
-  - Allows multiple SQS queues to process the workload in slightly different
-  ways.
+  - Allows multiple SQS queues to process the workload in slightly different ways.
 
 Offers:
 
@@ -4386,7 +4359,7 @@ Two types of workflow
 
 - Standard
   - Default
-  - 1 year workflow exeution limit
+  - 1 year workflow execution limit
 
 - Express
   - Designed for IOT or other high transaction uses
@@ -4401,8 +4374,7 @@ State machines are provided permission to interact with other AWS services via I
 
 #### 1.13.7.1. Step Function States
 
-States are the things inside a workflow, the things which occur. These states
-are available.
+States are the things inside a workflow, the things which occur. The available states are:
 
 - Succeed and Fail
   - the process will succeed or fail.
@@ -4415,8 +4387,7 @@ are available.
   - will create parallel branches based on a choice
 - Map
   - accepts a list of things
-  - for each item in that list, performs an action or set of actions based on
-  that particular item.
+  - for each item in that list, performs an action or set of actions based on that particular item.
 - Task
   - represents a single unit of work performed by a State Machine.
   - it allows the state machine to actually do things.
@@ -4442,88 +4413,63 @@ Public service that provides fully managed highly available message queues.
 - **Dead-letter queue**
   - if a message is received multiple times but is unable to be finished, this
   puts it into a different workload to try and fix the corruption.
-- ASG can scale and lambdas can be invoked based on queue length.
+- Auto-scaling groups (ASG) can scale and lambdas can be invoked based on queue length.
 - Standard queue
   - multi-lane highway. 
-  - guarantee the order and at least once delivery.
+  - best-effort ordering and at least once delivery.
+  - Maximum throughput
 - FIFO queue
   - single lane road with no way to overtake
   - guarantee the order and at exactly once delivery
   - 3,000 messages p/s with batching or up to 300 messages p/s without
 
-    Standard Queue| FIFO Queue |
-    ---------|----------|---------
-    Multi lane highway | Single lane road with no way to overtake | 
-    guarantee the order and at least one delivery | guarantee the order and at exactly one delivery | 
-    empty| 3000 messages p/s with batching or up to 300 messages p/s without | 
-
 Billed on **requests** not messages. A request is a single request to SQS.
 One request can return 0 - 10 messages up to 64KB data in total.
-Since requests can return 0 messages, frequently polling a SQS Queue, makes it
-less effective.
+Since requests can return 0 messages, frequently polling a SQS Queue, makes it less effective.
 
-Two ways to poll
+Two ways to poll:
 
-- short (immediate) : uses 1 request and can return 0 or more messages. If the
-queue is empty, it will return 0 and try again. This hurts queues that stay
-short
+- short (immediate) : uses 1 request and can return 0 or more messages. If the queue is empty, it will return 0 and try again. This hurts queues that stay short
 
-- long (waitTimeSeconds) : it will wait for up to 20 seconds for messages
-to arrive on the queue. It will sit and wait if none currently exist.
+- long (waitTimeSeconds) : it will wait for up to 20 seconds for messages to arrive on the queue. It will sit and wait if none currently exist.
 
-Messages can live on SQS Queue for up to 15 days. They offer KMS encryption
-at rest. Server side encryption. Data is encrypted in transit with SQS and any
-clients.
+Messages can live on SQS Queue for up to 15 days. They offer KMS encryption at rest. Server side encryption. Data is encrypted in transit with SQS and any clients.
 
-Access to a queue is based on identity policies or a queue policy. Queue
-policies only can allow access from an outside account. This is a resource policy.
+Access to a queue is based on identity policies or a queue policy. Queue policies can only allow access from an outside account. This is a resource policy.
 
 ### 1.13.9. Kinesis
 
-- Scalable streaming service. It is designed to inject data from
-lots of devices or lots of applications.
+- Scalable streaming service. It is designed to inject data from lots of devices or lots of applications.
 - Many producers send data into a Kinesis Stream. Streams are the basic unit of Kinesis. 
 - The stream can scale from low to near infinite data rates.
 - Highly available public service by design.
 - Streams store a 24-hour moving window of data.
   - Can be increased to 7 days.
   - Data 24 hours + 1s is replaced by new data entering the stream.
-- Kinesis includes the storage costs within it for the amount of data
-that can be ingested during a 24 hour period. However much you ingest during
-24 hours, that's included.
+- Billed based on shard units which are 1 MB/s or 1000 records/s. You specify the number of shards needed within your stream based on throughput requirements. Charged for each shard at an hourly rate.
 - Multiple consumers can access data from that moving window.
   - One might look at data points once per hour
   - Another looks at data 1 per minute.
 - Kinesis stream starts with 1 shard and expands as needed.
   - Each shard can have 1MB/s for ingestion and 2MB/s consumption.
 
-**Kinesis data records (1MB)** are stored across shards and are the blocks
-of data for a stream.
+**Kinesis data records (1MB)** are stored across shards and are the blocks of data for a stream.
 
 **Kinesis Data Firehose** connects to a Kinesis stream. It can move the data from a stream onto S3 or another service. Kinesis Firehose allows for the long term persistence of storage of kinesis data into services like S3. 
 
 ### 1.13.10. SQS vs Kinesis
 
-Kinesis
-
+Kinesis:
 - Large throughput or large numbers of devices
 - Huge scale ingestion with multiple consumers
 - Rolling window for multiple consumers
 - Designed for data ingestion, analytics, monitoring, app clicks
 
-SQS
-
+SQS:
 - 1 thing sending messages to the queue
 - One consumption group from that tier
 - Allow for async communications
 - Once the message is processed, it is deleted
-
-  Kinesis | SQS |
-  ---------|----------|
-  Large throughout or large numbers of devices| One thing or one group of things sending messages to the queue
-  Huge scale ingestion with multiple consumers| One consumption group from that tier| C2
-  Rolling window for multiple consumers | Allow for async communications | C3
-  Designed for data ingestion, analytics, monitoring, and app clicks | Once the message is processed, it is deleted | C3
 
 ---
 
@@ -4534,8 +4480,7 @@ SQS
 - CloudFront is a global object cache (CDN)
 - Download caching only
 - Content is cached in locations close to customers.
-- If the content is not available on the local cache when requested, CloudFront
-will fetch the item and cache it and deliver it locally.
+- If the content is not available on the local cache when requested, CloudFront will fetch the item and cache it and deliver it locally.
 - This provides lower latency (more responsiveness) and higher throughput (faster page loads) for customers.
 - Can handle static and dynamic content.
 - **Origin** the original location of your content, can be an S3 bucket or ALB. In theory it can be anywhere on the internet accessible by CloudFront.
@@ -4556,14 +4501,12 @@ Parameters can be passed on the url such as query string parameter.
 An example is `?language=en` and `?language=es`
 
 Caching will cache each string parameter storing two different objects.
-You must use the same string parameters again to retrieve them. If you remove
-them and the object is not caching it will need to be fetched first.
+You must use the same string parameters again to retrieve them. If you remove them and the object is not caching it will need to be fetched first.
 
 If string parameters aren't involved in the caching, you can select no
 to forward them to the origin.
 
-If the application does use **query string parameters**, you can use all of them for
-caching or just selected ones.
+If the application does use **query string parameters**, you can use all of them for caching or just selected ones.
 
 ### 1.14.2. AWS Certificate Manager (ACM)
 
@@ -4572,31 +4515,28 @@ caching or just selected ones.
 - Data is encrypted in-transit from the perspective of an outside observer.
 - HTTPS Certificates also allows for servers to prove their identity
 - Signed by a trusted authority (a Certificate Authority [CAs]), which are trusted by your browser.
-- To be secure, a website generates a certificate, and has a CA sign it. The
-website then uses that certificate to prove its authenticity.
+- To be secure, a website generates a certificate, and has a CA sign it. The website then uses that certificate to prove its authenticity.
 - ACM allows you to create, renew, and deploy certificates.
 - Supported AWS services ONLY (CloudFront, ALB and API Gateway, Elastic Beanstalk, CloudFormation, **NOT EC2**)
 - If it's not a managed service, ACM doesn't support it.
 - CloudFront must have a trusted and signed certificate. Can't be self signed.
+- replaces the manual process of purchasing, uploading and renewing SSL/TLS certificates.
 
 ### 1.14.3. Origin Access Identity (OAI)
 
 1. Identity can be associated with a CloudFront distribution.
 2. The edge locations gain this identity.
-3. Create or adjust the bucket policy on the S3 origin. Add an explicit allow
-for the OAI. Can remove any other explicit allows on the OAI. This leaves
-the implicit deny.
+3. Create or adjust the bucket policy on the S3 origin. Add an explicit allow for the OAI. Can remove any other explicit allows on the OAI. This leaves the implicit deny.
 
 As long as accesses are coming from the edge locations, it will know they
-are from the OAI and allow them. Any direct attempts will not use the OAI and
-will only get the implicit deny.
+are from the OAI and allow them. Any direct attempts will not use the OAI and will only get the implicit deny.
 
 Best practice is to create one OAI per CloudFront distribution to manage
 permissions.
 
 ### 1.14.3.(1/2) Lambda@Edge
 
-- Permits to run lightweight Labda functions at Edge Locations
+- Permits to run lightweight Lambda functions at Edge Locations
  - Adjust data between Viewer & Origin
  - Only Node.JS and Python are supported
  - Only AWS Public Space is supported ( NO VPC )
@@ -4616,14 +4556,12 @@ permissions.
 - Move the AWS network closer to customers.
 - Designed to optimize the flow of data from users to your AWS infrastructure.
 - While CloudFront caches your application at Edge Locations, Global Accelerator moves the AWS infrastructure closer to your customers. 
-- Generally customers who are further away from your infrastructure go through
-more internet based hops and this means a lower quality connection.
+- Generally customers who are further away from your infrastructure go through more internet based hops and this means a lower quality connection.
 - Normal IP addresses are unicast IP addresses. These refer to one thing.
-- Global Accelerator starts with 2 **anycast** IP address
+- Global Accelerator starts with 2 **anycast** IP addresses:
   - Special IP address
   - Anycast IPs allow a single IP to be in multiple locations.
-  - Traffic initially uses public internet and enters Global Accelerator at
-  the closest edge location.
+  - Traffic initially uses public internet and enters Global Accelerator at the closest edge location.
   - Traffic then flows globally across the AWS global backbone network.
 - Global accelerator is a network product, and it uses non HTTP/S (TCP/UDP) protocols.
 - If you see questions that mention _caching_ that will most likely be CloudFront but, if you see questions that mention TCP or UDP and the requirement for _global performance optimization_ then possibly it's going to be global accelerator which is the right answer.
@@ -4677,35 +4615,29 @@ Example of Flow Logs
 ### 1.15.2. Egress-Only Internet Gateway
 
 - IPv4 addresses are private or public
-- NAT allows IPv4 private IPs with a way to access public internet or public AWS services and receive responses.
+- NAT provides IPv4 private IPs with a way to access public internet or public AWS services and receive responses.
 - NAT does this in a way that will not allow externally initiated connections (from the public internet) IN.
 - NAT process exists because of the limitation of IPv4; it does not work with IPv6.
 - Using IPv6, all IPs are publicly routable.
   - Internet Gateway (IPv6) allows all IPs **in** and **out**
-- Egress-only is **outbound only** for IPv6. It is exactly the same as
-NAT, only outbound only.
-- To configure the Egress-only gateway, you must add default IPv6 route `::/0`
-added to RT with `eigw-id` as target.
+- Egress-only is **outbound only** for IPv6. It is exactly the same as NAT, only outbound only.
+- To configure the Egress-only gateway, you must add default IPv6 route `::/0` added to RT with `eigw-id` as target.
+- **egress-only internet gateway** is for IPv6 only.
+- **NAT gatewey** is for IPv4 only.
 
 ### 1.15.3. VPC Gateway Endpoints
 
 - Provide _private_ access to S3 and DynamoDB
   - Allow a private only resource inside a VPC or any resource inside a private-only VPC access to S3 and DynamoDB. (Remember that both S3 and DynamoDB are public services)
 
-Normally when you want to access a public service through a VPC, you
-need infrastructure. You would create an IGW and attach it to the VPC.
-Resources inside need to be granted IP address or implement one or more
-NAT gateways which allow instances with private IP addresses to access
-these public services.
+Normally when you want to access a public service through a VPC, you need infrastructure. You would create an IGW and attach it to the VPC.
+Resources inside need to be granted IP address or implement one or more NAT gateways which allow instances with private IP addresses to access these public services.
 
-- When you allocate a gateway endpoint to a subnet, a ***prefix list*** is added
-to the route table. The target is the gateway endpoint. Any traffic destined for S3, goes via the gateway endpoint. The gateway endpoint is highly available for all AZs in a region by default.
+- When you allocate a gateway endpoint to a subnet, a ***prefix list*** is added to the route table. The target is the gateway endpoint. Any traffic destined for S3, goes via the gateway endpoint. The gateway endpoint is highly available for all AZs in a region by default.
 
-- With a gateway endpoint you set which subnet will be used with it and
-it will configure automatically. A gateway endpoint is a VPC gateway object.
+- With a gateway endpoint you set which subnet will be used with it and it will configure automatically. A gateway endpoint is a VPC gateway object.
   - Endpoint policy controls what things can be connected to by that endpoint.
-
-- Gateway endpoints can only be used to access services in the same region.
+- Gateway endpoints can **only be used to access services in the same region**.
 Can't access cross-region services. You cannot, for instance, access an S3 bucket located in the `ap-southeast-2` region from a gateway endpoint in the `us-east-1` region.
 
 - Prevent Leaky Buckets: S3 buckets can be set to private only by allowing access ONLY from a gateway endpoint. For anything else, the _implicit deny_ will apply.
@@ -4720,37 +4652,23 @@ A limitation is that they are only accessible from inside that specific VPC.
   - For HA, add one endpoint, to one subnet, per AZ used in the VPC
   - Must add one endpoint for one subnet per AZ
 - Network access controlled via security groups.
-- You can use Endpoint policies to restrict what can be accessed with
-the endpoint.
+- You can use Endpoint policies to restrict what can be accessed with the endpoint.
 - ONLY TCP and IPv4 at the moment.
 - Behind the scenes, it uses ***PrivateLink***.
   - PrivateLink allows external services to be injected into your VPC either from AWS or $3^{rd}$ parties.
 - Endpoint provides a **NEW** service endpoint DNS
   - e.g. `vpce-123-xyz.sns.us-east-1.vpce.amazonaws.com`
-- **Regional DNS** is one single DNS name that works whatever AZ you're using to
-access the interface endpoint. Good for simplicity and HA.
+- **Regional DNS** is one single DNS name that works whatever AZ you're using to access the interface endpoint. Good for simplicity and HA.
 - **Zonal DNS** resolved to that one specific interface in that one specific AZ.
-- Either of those two points of endpoints can be used by applications to
-directly and immediately utilize interface endpoints.
-- PrivateDNS associates R53 private hosted zone with your VPC. This private
-hosted zone carries a replacement DNS record for the default service
-endpoint DNS name. It overrides the default service DNS with a new version
-that points at your interface endpoint. Enabled by default.
+- Either of those two points of endpoints can be used by applications to directly and immediately utilize interface endpoints.
+- PrivateDNS associates R53 private hosted zone with your VPC. This private hosted zone carries a replacement DNS record for the default service endpoint DNS name. It overrides the default service DNS with a new version that points at your interface endpoint. Enabled by default.
 
 #### 1.15.4.1. Gateway Endpoints vs Interface Endpoints
 
-**Gateway endpoints** work using prefix lists and route tables so they do not
-need changes to the applications. The application thinks it's communicating
-directly with S3 or DynamoDB and all we're doing by using a gateway endpoint
-is influencing the route that the traffic flow uses. Instead of using IGW,
-it goes via gateway endpoint and can use private IP addressing.
+**Gateway endpoints** work using prefix lists and route tables so they do not need changes to the applications. The application thinks it's communicating directly with S3 or DynamoDB and all we're doing by using a gateway endpoint is influencing the route that the traffic flow uses. Instead of using IGW, it goes via gateway endpoint and can use private IP addressing.
 Gateway endpoints because they are VPC gateway logical object; they are **highly available by design**
 
-**Interface Endpoints** uses DNS and a private IP address for the interface
-endpoint. You can either use the endpoint specific DNS names or you can
-enable PrivateDNS which overrides the default and allows unmodified
-applications to access the services using the interface endpoint. This doesn't
-use routing and only DNS.
+**Interface Endpoints** uses DNS and a private IP address for the interface endpoint. You can either use the endpoint specific DNS names or you can enable PrivateDNS which overrides the default and allows unmodified applications to access the services using the interface endpoint. This doesn't use routing and only DNS.
 Interface endpoints because they use normal VPC network interfaces are **not highly available**. 
 > Make sure as a Solutions Architect when you are designing an architecture if you are utilizing multiple AZs then you need to put interface endpoints in every AZ that you use inside that VPC.
 
@@ -4760,26 +4678,16 @@ VPC Peering is a service that lets you create a private and encrypted network li
 
 - Peering connection can be in the same or cross region and in the same or across accounts.
 
-- When you create a VPC peer, you can enable an option so that public hostnames
-of services in the peered VPC resolve to the private internal IPs. You
-can use the same DNS names if its in peered VPCs or not. If you attempt
-to resolve the public DNS hostname of an EC2 instance, it will resolve
-to the private IP address of the EC2 instance.
+- When you create a VPC peer, you can enable an option so that public hostnames of services in the peered VPC resolve to the private internal IPs. You can use the same DNS names if its in peered VPCs or not. If you attempt to resolve the public DNS hostname of an EC2 instance, it will resolve to the private IP address of the EC2 instance.
 
 - VPCs in the same region can reference each other by using security group id.
-You can do the same efficient referencing and nesting of security groups that
-you can do if you're inside the same VPC. This is a feature that only works
-with VPC peers inside the same region.
+You can do the same efficient referencing and nesting of security groups that you can do if you're inside the same VPC. This is a feature that only works with VPC peers inside the same region.
 
-In different regions, you can utilize security groups, but you'll need to
-reference IP addresses or IP ranges. If VPC peers are in the same region,
-then you can do the logical referencing of an entire security group.
+In different regions, you can utilize security groups, but you'll need to reference IP addresses or IP ranges. If VPC peers are in the same region, then you can do the logical referencing of an entire security group.
 
-VPC peering connects **ONLY TWO**
+Peering connects **only two** VPC's
 
-VPC Peering does not support **transitive peering**.
-If you want to connect 3 VPCs, you need 3 connections. You can't route
-through interconnected VPCs.
+VPC Peering does not support **transitive peering**. If you want to connect 3 VPCs, you need 3 connections. You can't route through interconnected VPCs.
 
 VPC Peering Connections CANNOT be created with overlapping VPC CIDRs.
 
@@ -4789,8 +4697,7 @@ VPC Peering Connections CANNOT be created with overlapping VPC CIDRs.
 
 ### 1.16.1. AWS Site-to-Site VPN
 
-- A logical connection between a VPC and on-premise network encrypted in transit
-using IPSec, running over the public internet (in most cases).
+- A logical connection between a VPC and on-premise network encrypted in transit using IPSec, running over the public internet (in most cases).
 - This can be fully Highly Available if you design it correctly
 - Quick to provision, less than an hour.
 - VPNs connect VPCs and private on-prem networks.
@@ -4812,6 +4719,7 @@ Static| Dynamic |
   - AWS limit, will need to check speed supported by customer router.
   - Will be processing overhead on encrypting and decrypting data.
   At high speeds, this overhead can be significant.
+- Each VPN connection includes two tunnels for HA
 - Latency is inconsistent because it uses the public internet.
 - Cost
   - AWS charges hourly
@@ -4830,11 +4738,10 @@ Static| Dynamic |
   - 10 Gbps: 10GBASE-LR
 - This is a **cross connect** to your customer router (requires VLANs/BGP)
 - You can connect to a partner router if extending to your location.
-  - The port needs to be arranged to connect somewhere else and connect to
-  your hardware.
+  - The port needs to be arranged to connect somewhere else and connect to your hardware.
 - This is a single fiber optic cable from the AWS Managed DX port to your network.
 - You can run Virtual Interfaces (VIFs) over a single DX connect fiber optic line.
-- There is a one-to-many relationship between a DX line and VIFs. Therefore, you can multiple VIFs running on a single DX line. 
+- There is a one-to-many relationship between a DX line and VIFs. Therefore, you can have multiple VIFs running on a single DX line. 
 - VIFs are of two types:
   - Private VIF (VPC)
     - Connects to one AWS VPC
@@ -4843,9 +4750,8 @@ Static| Dynamic |
     - Only public services, not public internet
     - Can be used with a site-to-site VPN to enable a private encryption using IPSec.
 
-Has one physical cable with **no high availability and no encryption**.
-DX Port Provisioning is quick, the cross-connect takes longer.
-Physical installation of cross-connect network can take weeks or months
+Has one physical cable with **no high availability and no encryption**. DX Port Provisioning is quick, the cross-connect takes longer.
+Physical installation of cross-connect network can take weeks or months.
 Generally use a VPN first then bring a DX in and leave VPN as backup.
 
 - Up to 40 Gbps with aggregation, 4 x 10 Gbps ports.
@@ -4854,17 +4760,10 @@ Generally use a VPN first then bring a DX in and leave VPN as backup.
 
 DX provides NO ENCRYPTION and needs to be managed on a per application basis.
 There is a common way around this limitation.
-The Public VIF allows connections to AWS public services. Inside the VPC we
-already have a virtual private gateway, because this is used for any private
-VIFs running over the Direct Connect. Creating a virtual private gateway
-creates end points that are located inside the AWS public zone with public
-IP addresses. These end points have already been created and they already
-exist. We can create a VPN and instead of using the public internet as the
+The Public VIF allows connections to AWS public services. Inside the VPC we already have a virtual private gateway, because this is used for any private VIFs running over the Direct Connect. Creating a virtual private gateway creates end points that are located inside the AWS public zone with public IP addresses. These end points have already been created and they already exist. We can create a VPN and instead of using the public internet as the
 transit network, you can use the public VIF running over Direct Connect.
 
-You run an IPSEC VPN over the public VIF, over the Direct Connect connection,
-you get all of the benefits of Direct Connect such as high speeds, and all
-the benefits of IPSEC encryption.
+You run an IPSEC VPN over the public VIF, over the Direct Connect connection, you get all of the benefits of Direct Connect such as high speeds, and all the benefits of IPSEC encryption.
 
 ### 1.16.3. AWS Transit Gateway (TGW)
 
@@ -4876,12 +4775,11 @@ the benefits of IPSEC encryption.
   - VPC attachments
   - Site to Site VPN attachments
   - Direct Connect attachments
-- VPC attachments are configured with a subnet in each AZ where service
-is required.
+- VPC attachments are configured with a subnet in each AZ where service is required.
 - Can be used to create global networks.
   - You can use these for cross-region peering attachments.
 - Can share between accounts using AWS Resource Access Manager (RAM)
-- You achieve a less network complexity if you implement a transit gateway (TGW)
+- You have less network complexity if you implement a transit gateway
 
 ### 1.16.4. Storage Gateway
 
@@ -4942,15 +4840,11 @@ Max is 100 PB per snowmobile.
 
 ### 1.16.6. AWS Directory Service
 
-Directories stores objects, users, groups, computers, servers, file shares with
-a structure called a domain / tree. Multiple trees can be grouped into a forest.
+Directories stores objects, users, groups, computers, servers, file shares with a structure called a domain / tree. Multiple trees can be grouped into a forest.
 
-Devices can join a directory so laptops, desktops, and servers can all have
-a centralized management and authentication. You can sign into multiple
-devices with the same username and password.
+Devices can join a directory so laptops, desktops, and servers can all havea centralized management and authentication. You can sign into multipledevices with the same username and password.
 
-One common directory is **Active Directory** by Microsoft and its full name is
-**Microsoft Active Directory Domain Services** or AD DS.
+One common directory is **Active Directory** by Microsoft and its full name is **Microsoft Active Directory Domain Services** or AD DS.
 
 - AWS managed implementation.
 - Runs within a VPC as a private service.
@@ -4963,17 +4857,14 @@ One common directory is **Active Directory** by Microsoft and its full name is
 #### 1.16.6.1. Directory Modes
 
 - **Simple AD**: should be default. Designed for simple requirements.
-- **Microsoft AD**: is anything with Windows or if it needs a trust relationship
-with on-prem. This is not an emulation or adjusted by AWS.
-- **AD Connector**: Use AWS services without storing any directory info in the
-cloud, it proxies to your on-prem directory.
+- **Microsoft AD**: is anything with Windows or if it needs a trust relationship with on-prem. This is not an emulation or adjusted by AWS.
+- **AD Connector**: Use AWS services without storing any directory info in the cloud, it proxies to your on-prem directory.
 
 ### 1.16.7. AWS DataSync
 
 - Data transfer service TO and FROM AWS.
 - This is used for migrations or for large amounts of data processing transfers.
-- Designed to work at huge scales. Each agent can handle 10 Gbps and each job
-can handle 50 million files.
+- Designed to work at huge scales. Each agent can handle 10 Gbps and each job can handle 50 million files.
 - Transfers metadata and timestamps
 - Each agent is about 100 TB per day.
 - Can use bandwidth limiters to avoid customer impact
@@ -5011,8 +4902,7 @@ can handle 50 million files.
 - Can perform full range of different backups
   - Client side and AWS side
   - Can perform automatic and on-demand backups.
-- File systems can be access using VPC, Peering, VPN, Direct Connect. Native
-windows filesystem or Directory Services.
+- File systems can be accessed using VPC, Peering, VPN, Direct Connect, Native windows filesystem or Directory Services.
 
 #### 1.16.8.1. Words to look for
 
@@ -5023,11 +4913,11 @@ windows filesystem or Directory Services.
 - Managed service, no file server admin
 - Integrates with DS and your own directory.
 
-### FSx for Lustre
+### 1.16.9 FSx for Lustre
 
 - Designed for HPC - Linux workloads Clients
 - Designed for Machine Learning, Big Data, Financial Modelling
-- 100 GB/s throughout & sub millisecond latencies
+- 100 GB/s throughput & sub millisecond latencies
 - Deployment types **Persistent** or **Scratch**
   - Scratch - Optimized for Short term no replication & fast ( Designed for pure performance) - NO HA, NO REPLICATION
   - Persistent - longer term, HA ( IN ONE AZ), self-healing
@@ -5043,9 +4933,8 @@ windows filesystem or Directory Services.
 - Share functionality with parameter store. Sometimes both are appropriate.
 - Designed specifically for secrets, passwords, API keys.
 - Usable via Console, CLI, API, or SDK (integration)
-- Supports the automatic rotation of secrets using Lambda.
-- Directly integrates with RDS and a limited set of AWS products. If lambda
-is invoked and changes a secret, the password can automatically change in RDS.
+- Supports the automatic rotation of secrets using Lambda. (parameter store does not)
+- Directly integrates with RDS and a limited set of AWS products. If lambda is invoked and changes a secret, the password can automatically change in RDS.
 - Secrets are encrypted at rest.
 - Integrates with IAM, can use IAM permissions to control access to secrets.
 
@@ -5057,15 +4946,11 @@ is invoked and changes a secret, the password can automatically change in RDS.
 4. Periodically, a lambda function is invoked to rotate the secrets.
 5. The Lambda uses an execution role to get permissions.
 
-Secrets are secured using KMS so you never risk any leakage via physical access
-to the AWS hardware and KMS ensures role separation.
+Secrets are secured using KMS so you never risk any leakage via physical access to the AWS hardware and KMS ensures role separation.
 
 ### 1.17.2. AWS Shield and WAF (Web Application Firewall)
 
-Provides against DDoS attacks with AWS resources. This is a denial of
-service attack. Normally not possible to block them by using individual
-IP addresses. Without detailed analysis, the traffic looks like normal
-requests to your website.
+Protects against DDoS attacks with AWS resources. Normally not possible to block them by using individual IP addresses. Without detailed analysis, the traffic looks like normal requests to your website.
 
 - Shield Standard
   - Free with Route53 and CloudFront as default
@@ -5073,8 +4958,7 @@ requests to your website.
 - Shield advanced
   - $3000 per month
   - Includes EC2, ELB, CloudFront, Global Acceleration and R53
-  - Provides access to DDoS advanced response team and financial insurance
-against increased costs.
+  - Provides access to DDoS advanced response team and financial insurance against increased costs.
 
 - WAF (web application firewall)
   - Layer 7 firewall (HTTP/s) firewall
@@ -5088,40 +4972,30 @@ against increased costs.
 
 #### 1.17.2.1. Example of Architecture
 
-Shield standard automatically looks at the data before any data reaches
-past Route53.
-The user is directed to the closest CloudFront location. Again, shield
-standard looks at the data again before it moves on.
+Shield standard automatically looks at the data before any data reaches past Route53.
+The user is directed to the closest CloudFront location. Again, shield standard looks at the data again before it moves on.
 
-WAF Rules are defined and included in a WEBACL which is associated to a
-cloud front distribution and deployed to the edge.
+WAF Rules are defined and included in a WEBACL which is associated to a cloud front distribution and deployed to the edge.
 
 Shield advanced can then intercept traffic when it reaches the load balancer.
-Once the data reaches the VPC, it has been filtered at Layer 3, 4, and 7
-already.
+Once the data reaches the VPC, it has been filtered at Layer 3, 4, and 7 already.
 
 Layer 7 filtering is only provided by WAF.
 
 ### 1.17.3. CloudHSM
 
-KMS is the key management service within AWS. It is used for encryption within
-AWS and it integrates with other AWS products. Can generate keys, manage
-keys, and can integrate for encryption. The problem is this is a shared
-service. You're using a service which other accounts within AWS also use.
+KMS is the key management service within AWS. It is used for encryption within AWS and it integrates with other AWS products. Can generate keys, manage keys, and can integrate for encryption. The problem is this is a shared service. You're using a service which other accounts within AWS also use.
 Although the permissions are strict, AWS still does manage the hardware for KMS.
-KMS is a **Hardware Security Module** or HSM. These are industry standard pieces
-of hardware which are designed to manage keys and perform cryptographic
-operations.
+KMS is a **Hardware Security Module** or HSM. These are industry standard pieces of hardware which are designed to manage keys and perform cryptographic operations.
 
 You can run your own HSM on premise.
-**Cloud HSM is a true "single tenant"hardware security module (HSM)** that's hosted within the AWS cloud.
-AWS provisions the HW, but it is impossible for them to help. There is no way
-to recover data from them if access is lost.
+**Cloud HSM is a true "single tenant" hardware security module (HSM)** that's hosted within the AWS cloud.
+AWS provisions the HW, but it is impossible for them to help. There is no way to recover data from them if access is lost.
 
-Fully FIPS 140-2 Level 3 (KMS is L2 overall, but some is L3)
-IF you require level 3 overall, you MUST use CloudHSM.
+CLoudHSM is fully FIPS 140-2 Level 3 compliant (KMS is L2 overall, but some is L3)
+If you require level 3 overall, you MUST use CloudHSM.
 
-KSM all actions are performed with AWS CLI and IAM roles.
+With KMS all actions are performed with AWS CLI and IAM roles.
 
 HSM will not integrate with AWS by design and uses industry standard APIs.
 
@@ -5131,23 +5005,18 @@ HSM will not integrate with AWS by design and uses industry standard APIs.
 
 KMS can use CloudHSM as a **custom key store**, CloudHSM integrates with KMS.
 
-HSM is not highly available and runs within one AZ. To be HA, you need at least
-two HSM devices and one in each AZ you use. Once HSM is in a cluster, they
-replicate all policies in sync automatically.
+HSM is not highly available and runs within one AZ. To be HA, you need at least two HSM devices and one in each AZ you use. Once HSM is in a cluster, they replicate all policies in sync automatically.
 
-HSM needs an endpoint in the subnet of the VPC to allow resources access
-to the cluster.
+HSM needs an endpoint in the subnet of the VPC to allow resources access to the cluster.
 
 AWS has no access to the HSM appliances which store the keys.
 
 #### 1.17.3.1. Cloud HSM Use Cases
 
-- No native AWS integration with AWS products. You can't use S3 SSE with
-CloudHSM.
-- Can offload the SSL/TLS processing from webservers. CloudHSM
-is much more efficient to do these encryption processes.
+- No native AWS integration with AWS products. You can't use S3 SSE with CloudHSM.
+- Can offload the SSL/TLS processing from webservers. CloudHSM is much more efficient to do these encryption processes.
 - Oracle Databases can use CloudHSM to enable **transparent data encryption (TDE)**
-- Can protect the private keys an issuing certificate authority.
+- Can protect the private keys of an issuing certificate authority.
 - Anything that needs to interact with non AWS products.
 
 ---
@@ -5178,12 +5047,9 @@ NoSQL Database as a Service (DBaaS)
   - Composite (Partition and Sort)
 - Every item in the table needs a unique primary key.
 - Attributes may or may not be there. This is not necessary.
-- Items can be at most 400KB in size. This includes the primary key and
-attributes.
+- Items can be at most 400KB in size. This includes the primary key and attributes.
 
-In DynamoDB, capacity means speed. If you choose on-demand capacity model
-you don't have to worry about capacity. You only pay for the operations
-for the table.
+In DynamoDB, capacity means speed. If you choose on-demand capacity model you don't have to worry about capacity. You only pay for the operations for the table.
 If you choose provisioned capacity, you must set this on a per table basis.
 
 Capacity is set per WCU or RCU
@@ -5193,23 +5059,18 @@ Capacity is set per WCU or RCU
 
 #### 1.18.1.2. Dynamo DB Backups
 
-**On-demand Backups**: Similar to manual RDS snapshots. Full backup of the table
-that is retained until you manually remove that backup. This can be used to
-restore data in the same region or cross-region. You can adjust indexes, or
-adjust encryption settings.
+**On-demand Backups**: Similar to manual RDS snapshots. Full backup of the table that is retained until you manually remove that backup. This can be used to restore data in the same region or cross-region. You can adjust indexes, or adjust encryption settings.
 
 **Point-in-time Recovery**: Must be enabled on each table and is off by
-default. This allows continuous record of changes for 35 days to allow you to
-replay any point in that window to a 1 second granularity.
+default. This allows continuous record of changes for 35 days to allow you to replay any point in that window to a 1 second granularity.
 
 #### 1.18.1.3. Dynamo DB Considerations
 
 - NoSQL, you should jump towards DynamoDB.
 - Relational data, this is NOT DynamoDB.
-- If you see key value and DynamoDB is an answer, this is likely the proper
-choice.
+- If you see key value and DynamoDB is an answer, this is likely the proper choice.
 
-Access to Dynamo is from the console, CLI, or API. You don't have SQL access.
+Access to DynamoDB is from the console, CLI, or API. You don't have SQL access.
 
 Billing based on:
 
@@ -5217,15 +5078,13 @@ Billing based on:
 - Storage on that table
 - Additional features on that table
 
-Can purchase reserved capacity with a cheaper rate for a longer term commit.
+Can purchase reserved capacity with a cheaper rate for a longer term commitment.
 
 ### 1.18.2. DynamoDB Operations, Consistency, and Performance
 
 #### 1.18.2.1. DynamoDB Reading and Writing
 
-**On-Demand**: Unknown or unpredictable load on a table. This is also good
-for as little admin overhead as possible. Pay a price per million
-Read or Write units. This is as much as 5 times the price as provisioned.
+**On-Demand**: Unknown or unpredictable load on a table. This is also good for as little admin overhead as possible. Pay a price per million Read or Write units. This is as much as 5 times the price as provisioned.
 
 **Provisioned**: RCU and WCU set on a per table basis.
 
@@ -5234,62 +5093,46 @@ Every operation consumes at least 1 RCU/WCU
 1 RCU = 1 x 4KB read operation per second. This rounds up.
 1 WCU = 1 x 1KB write operation per second.
 
-Every single table has a WCU and RCU burst pool. This is 500 seconds
-of RCU or WCU as set by the table.
+Every single table has a WCU and RCU burst pool. This is 500 seconds of RCU or WCU as set by the table.
 
 #### 1.18.2.2. Query
 
 You have to pick one Partition Key (PK) value to start.
 
-The PK can be the sensor unit, the Sort Key (SK) can be the day of the
-week you want to look at.
+The PK can be the sensor unit (for example), the Sort Key (SK) can be the day of the week you want to look at.
 
-Query accepts a single PK value and **optionally** a SK or range.
-Capacity consumed is the size of all returned items. Further filtering
-discards data, but capacity is still consumed.
+Query accepts a single PK value and **optionally** a SK or range. Capacity consumed is the size of all returned items. Further filtering discards data, but capacity is still consumed.
 
 In this example you can only query for one weather station.
 
-If you query a PK it can return all fields items that match. It is always
-more efficient to pull as much data as needed per query to save RCU.
+If you query a PK it can return all fields items that match. It is always more efficient to pull as much data as needed per query to save RCU.
 
-You have to query for at least one item of PK and are charged for the
-response of that query operation.
+You have to query for at least one item of PK and are charged for the response of that query operation.
 
-If you filter data and only look at one attribute, you will still be
-charged for pulling all the attributes against that query.
+If you filter data and only look at one attribute, you will still be charged for pulling all the attributes against that query.
 
 #### 1.18.2.3. Scan
 
 Least efficient when pulling data from Dynamo, but the most flexible.
 
-Scan moves through the table item by item consuming the capacity
-of every item. Even if you consume less than the whole table, it will
-charge based on that. It adds up all the values scanned and will charge
-rounding up.
+Scan moves through the table item by item consuming the capacity of every item. Even if you consume less than the whole table, it will charge based on that. It adds up all the values scanned and will charge rounding up.
 
 #### 1.18.2.4. DynamoDB Consistency Model
 
 **Eventually** Consistent: easier to implement and scales better
 **Strongly (Immediately)** Consistent: more costly to achieve
 
-Every piece of data is replicated between storage nodes. There is one
-Leader storage node and every other node follows.
+Every piece of data is replicated between storage nodes. There is one Leader storage node and every other node follows.
 
-Writes are always directed to the **leader node**. Once the leader
-is complete, it is **consistent**. It then starts the process of replication.
-This typically takes milliseconds and assumes the lack of any faults on the
-storage nodes.
+Writes are always directed to the **leader node**. Once the leader is complete, it is **consistent**. It then starts the process of replication.
+This typically takes milliseconds and assumes the lack of any faults on the storage nodes.
 
-Eventual consistent could lead to stale data if a node is checked before
-replication completes. You get a discount for this risk.
+Eventual consistent could lead to stale data if a node is checked before replication completes. You get a discount for this risk.
 
-A strongly consistent read always uses the leader node and is less
-scalable.
+A strongly consistent read always uses the leader node and is less scalable.
 
-Not every application can tolerate eventual consistency. If you have a stock
-database or medical information, you must use strongly consistent reads.
-If you can tolerate the cost savings you can scale better.
+Not every application can tolerate eventual consistency. If you have a stock database or medical information, you must use strongly consistent reads.
+If you can tolerate the eventual consistency you can scale better.
 
 #### 1.18.2.5. WCU Example Calculation
 
@@ -5301,7 +5144,7 @@ To calculate the Write Capacity Unit we need:
 
 1. The number of items to store. We represent this as $N_i$.
 2. Average size per item rounded up. We represent this as $S_i$.
-3. Multiply 1 & 2 above.
+3. $WCU = N_i * S_i$
 
 Note: 1 WCU $=$ 1KB
 
@@ -5318,7 +5161,7 @@ Answer: $N_i \cdot S_i$ = $10 \cdot 3 = 30$ WCUs
 
 Note: 1 RCU $=$ 4KB
 
-Example: What is the RCU of storing 10 items per second with 2.5K average size per item. 
+Example: What is the RCU of reading 10 items per second with 2.5K average size per item. 
 
 $N_i = 10$
 $S_i = 1$ $\Rightarrow$ how many 2.5 ($\sim$3) can you get in 4, which is 1.
@@ -5327,9 +5170,7 @@ Answer: $N_i \cdot S_i$ = $10 \cdot 1 = 10$ RCUs
 
 ### 1.18.3. DynamoDB Streams and Triggers
 
-DynamoDB stream is a time ordered list of changes to items in a DynamoDB
-table. A stream is a 24 hour rolling window of the changes.
-It uses Kinesis streams on the backend.
+DynamoDB stream is a time ordered list of changes to items in a DynamoDB table. A stream is a 24 hour rolling window of the changes. It uses Kinesis streams on the backend.
 
 This is enabled on a per table basis. This records
 
@@ -5346,33 +5187,26 @@ There are four view types that it can be configured with:
 - OLD_IMAGE : shows the initial state before the change
 - NEW_AND_OLD_IMAGES : shows both before and after the change
 
-Pre or post change state might be empty if you use
-**insert** or **delete**
+Pre or post change state might be empty if you use **insert** or **delete**
 
 #### 1.18.3.1. Trigger Concepts
 
 Allow for actions to take place in the event of a change in data
 
-Item change generates an event that contains the data which
-was changed. The specifics depend on the view type.
-The action is taken using that data. This will combine the
-capabilities of stream and lambda. Lambda will complete some compute based on
-this trigger.
+Item change generates an event that contains the data which was changed. The specifics depend on the view type.
+The action is taken using that data. This will combine the capabilities of stream and lambda. Lambda will complete some compute based on this trigger.
 
 This is great for reporting and analytics in the event of changes such as
 stock levels or data aggregation.
 Good for data aggregation for stock or voting apps.
-This can provide messages or notifications and eliminates the
-need to poll databases.
+This can provide messages or notifications and eliminates the need to poll databases.
 
 ### 1.18.4. DynamoDB Local (LSI) and Global (GSI) Secondary Indexes
 
 - Great for improving data retrieval in DynamoDB.
-- Query can only work on 1 PK value at a time and optionally a single
-or range of SK values.
+- Query can only work on 1 PK value at a time and optionally a single or range of SK values.
 - Indexes are a way to provide an alternative view on table data.
-- You have the ability to choose which attributes are projected
-to the table.
+- You have the ability to choose which attributes are projected to the table.
 
 #### 1.18.4.1. Local Secondary Indexes (LSI)
 
@@ -5396,28 +5230,23 @@ to the table.
 - Allows for alternative PK and SK.
 - GSI will have their own RCU and WCU allocations.
 - You can then choose which attributes are included in this table.
-- GSIs are **always** eventually consistent. Replication between
-base and GSI is Async
+- GSIs are **always** eventually consistent. Replication between base and GSI is Async
 
 #### 1.18.4.3. LSI and GSI Considerations
 
 - Must be careful which projections are used to manage capacity.
-- If you don't project a specific attribute, then you require the attribute when
-querying data, it will then fetch the data later in an inefficient way.
-- This means you should try to plan what will be used on the front.
+- If you don't project a specific attribute, then you require the attribute when querying data, it will then fetch the data later in an inefficient way.
+- This means you should try to plan what will be used upfront.
 
 **GSI as default** and only use LSI when **strong consistency** is required
 
-Indexes are designed when data is in a base table needs an alternative
-access pattern. This is great for a security team or data science team
-to look at other attributes from the original purpose.
+Indexes are designed when data is in a base table needs an alternative access pattern. This is great for a security team or data science team to look at other attributes from the original purpose.
 
 ### 1.18.5. DynamoDB Global Tables
 
 - Global tables provide multi-master cross-region replication.
   - All tables are the same.
-- Tables are created in multiple AWS regions. In one of the tables, you
-configure the links between all of the tables.
+- Tables are created in multiple AWS regions. In one of the tables, you configure the links between all of the tables.
 - DynamoDB will enable replication between all of the tables.
   - Tables become table replicas.
 - Between the tables, **last writer wins** in conflict resolution.
@@ -5432,101 +5261,60 @@ configure the links between all of the tables.
 
 This is an in memory cache for Dynamo.
 
-**Traditional Cache**: The application needs to access some data and checks
-the cache. If the cache doesn't have the data, this is known as a cache miss.
-The application then loads directly from the database. It then updates the
-cache with the new data. Subsequent queries will load data from the cache as
-a cache hit and it will be faster
+**Traditional Cache**: The application needs to access some data and checks the cache. If the cache doesn't have the data, this is known as a cache miss.
+The application then loads directly from the database. It then updates the cache with the new data. Subsequent queries will load data from the cache as a cache hit and it will be faster
 
-**DAX**: The application instance has DAX SDK added on. DAX and dynamoDB are one
-in the same. Application uses DAX SDK and makes a single call for the data which
-is returned by DAX. If DAX has the data, then the data is returned directly. If
-not it will talk to Dynamo and get the data. It will then cache it for future
-use. The benefit of this system is there is only one set of API calls using
-one SKD. It is tightly integrated and much less admin overhead.
+**DAX**: The application instance has DAX SDK added on. DAX and dynamoDB are one in the same. Application uses DAX SDK and makes a single call for the data which is returned by DAX. If DAX has the data, then the data is returned directly. If not it will talk to Dynamo and get the data. It will then cache it for future use. The benefit of this system is there is only one set of API calls using one SDK. It is tightly integrated and much less admin overhead.
 
 #### 1.18.6.1. DAX Architecture
 
-This runs from within a VPC and is designed to be deployed to multiple
-AZs in that VPC. Must be deployed across AZs to ensure it is highly available.
+This runs from within a VPC and is designed to be deployed to multiple AZs in that VPC. Must be deployed across AZs to ensure it is highly available.
 
-DAX is a cluster service where nodes are placed into different AZs. There is
-a **primary node** which is the read and write note. This replicates out to
-other nodes which are **replica nodes** and function as read replicas. With this
-architecture, we have an EC2 instance running an application and the DAX
-SDK. This will communicate with the cluster. On the other side, the cluster
-communicates with DynamoDB.
+DAX is a cluster service where nodes are placed into different AZs. There is a **primary node** which is the read and write note. This replicates out to other nodes which are **replica nodes** and function as read replicas. With this architecture, we have an EC2 instance running an application and the DAX SDK. This will communicate with the cluster. On the other side, the cluster communicates with DynamoDB.
 
-DAX maintains two different caches. First is the **item cache** and this caches
-individual items which are retrieved via the **GetItem** or **BatchGetItem**
-operation. These operate on single items and must specify the items partition
-or sort key.
+DAX maintains two different caches. First is the **item cache** and this caches individual items which are retrieved via the **GetItem** or **BatchGetItem** operation. These operate on single items and must specify the items partition or sort key.
 
-There is a **query cache** which holds data and the parameters used for the
-original query or scan. Whole query or scan operations can be rerun
+There is a **query cache** which holds data and the parameters used for the original query or scan. Whole query or scan operations can be rerun
 and return the same cached data.
 
 Every DAX cluster has an endpoint which will load balance across the cluster.
-If data is retrieved from DAX directly, then it's called a cache hit and the
-results can be returned in microseconds.
+If data is retrieved from DAX directly, then it's called a cache hit and the results can be returned in microseconds.
 
-Any cache misses, so when DAX has to consult DynamoDB, these are generally
-returned in single digit milliseconds. Now in writing data to DynamoDB,
-DAX can use write-through caching, so that data is written into DAX at the
-same time as being written into the database.
+Any cache misses, so when DAX has to consult DynamoDB, these are generally returned in single digit milliseconds. Now in writing data to DynamoDB, DAX can use write-through caching, so that data is written into DAX at the same time as being written into the database.
 
-If a cache miss occurs while reading, the data is also written to the primary
-node of the cluster and the data is retrieved. And then it's replicated from
-the primary node to the replica nodes.
+If a cache miss occurs while reading, the data is also written to the primary node of the cluster and the data is retrieved. And then it's replicated from the primary node to the replica nodes.
 
-When writing data to DAX, it can use write-through. Data is written to the
-database, then written to DAX.
+When writing data to DAX, it can use write-through. Data is written to the database, then written to DAX.
 
 #### 1.18.6.2. DAX Considerations
 
 - Primary node which writes and Replicas which support read operations.
-- Nodes are HA, if the primary node fails there will be an election and
-secondary nodes will be made primary.
-- In-memory cache allows for much faster read operations and significantly
-reduced costs. If you are performing the same set of read operations on the same
-set of data over and over again, you can achieve performance improvements
-by implementing DAX and caching those results.
+- Nodes are HA, if the primary node fails there will be an election and secondary nodes will be made primary.
+- In-memory cache allows for much faster read operations and significantly reduced costs. If you are performing the same set of read operations on the same set of data over and over again, you can achieve performance improvements by implementing DAX and caching those results.
 - With DAX you can scale up or scale out.
-- DAX supports write-through. If you write data to DynamoDB, you can
-use the DAX SDK. DAX will handle that data being committed to DynamoDB
-and also storing that data inside the cache.
-- DAX is not a public service and is deployed within a VPC. Anything
-that uses that data many times will benefit from DAX.
+- DAX supports write-through. If you write data to DynamoDB, you can use the DAX SDK. DAX will handle that data being committed to DynamoDB and also storing that data inside the cache.
+- DAX is not a public service and is deployed within a VPC. Anything that uses that data many times will benefit from DAX.
 - Any questions which talk about caching with DynamoDB, assume it is DAX.
 
 ### 1.18.7. Amazon Athena
 
-- You can take data stored in S3 and perform Ad-hoc queries on data. Pay
-only for the data consumed.
-- Start off with structured, semi-structured and even unstructured data that is
-stored in its raw form on S3.
-- Athena uses **schema-on-read**, the original data is never changed
-and remains on S3 in its original form.
+- You can take data stored in S3 and perform Ad-hoc queries on data. Pay only for the data consumed.
+- Start off with structured, semi-structured and even unstructured data that is stored in its raw form on S3.
+- Athena uses **schema-on-read**, the original data is never changed and remains on S3 in its original form.
 - The schema which you define in advance, modifies data in flight when its read.
 - Normally with databases, you need to make a table and then load the data in.
-- With Athena you create a schema and load data on this schema on the fly in
-a relational style way without changing the data.
-- The output of a query can be sent to other services and can be
-performed in an event driven fully serverless way.
+- With Athena you create a schema and load data on this schema on the fly in a relational style way without changing the data.
+- The output of a query can be sent to other services and can be performed in an event driven fully serverless way.
 
 #### 1.18.7.1. Athena Explained
 
 The source data is stored on S3 and Athena can read from this data.
-In Athena you are defining a way to get the original data and defining
-how it should show up for what you want to see.
+In Athena you are defining a way to get the original data and defining how it should show up for what you want to see.
 
-Tables are defined in advance in a data catalog and data is projected
-through when read. It allows SQL-like queries on data without transforming
-the data itself.
+Tables are defined in advance in a data catalog and data is projected through when read. It allows SQL-like queries on data without transforming the data itself.
 
 This can be saved in the console or fed to other visualization tools.
 
-You can optimize the original data set to reduce the amount of space uses
-for the data and reduce the costs for querying that data. For more information see the AWS [documentation.](https://aws.amazon.com/cloudtrail/pricing/)
+You can optimize the original data set to reduce the amount of space used for the data and reduce the costs for querying that data. For more information see the AWS [documentation.](https://aws.amazon.com/cloudtrail/pricing/)
 
 [^1]: For more information on Server Name Indication see the Cloudfare SNI [documentation.](https://www.cloudflare.com/learning/ssl/what-is-sni/)
