@@ -1580,7 +1580,6 @@ A single target bucket can be used for many source bucket (use prefixes to serpe
 
 You need to manually manage the deletion and removal of logs in target bucket.
 
-
 ---
 
 ## 1.5. Virtual-Private-Cloud-VPC
@@ -1595,8 +1594,7 @@ Dotted decimal notation for human readability.
 - Octet are the numbers between the period.
 
 There are just over 4 billion addresses.
-This was not very flexible because it was either too small or large for
-some corporations. Some IP addresses was always left unused.
+This was not very flexible because it was either too small or large for some corporations. Some IP addresses was always left unused.
 
 #### 1.5.1.2. Classful Addressing
 
@@ -1621,8 +1619,7 @@ These can't communicate over the internet and are used internally only
 
 #### 1.5.1.4. Classless inter-domain routing (CIDR)
 
-CIDR networks are represented by the starting IP address of the network
-called the network address and the prefix.
+CIDR networks are represented by the starting IP address of the network called the network address and the prefix.
 
 CIDR Example: `10.0.0.0/16`
 
@@ -1642,8 +1639,7 @@ CIDR Example: `10.0.0.0/16`
 - `10.0.0.0/24` means 10.0.0.ANYTHING - Class C
 - `10.0.0.0/32` means only 1 IP address
 
-`10.0.0.0/16` is the equivalent of `1234` as a password. You should consider
-other ranges that people might use to ensure it does not overlap.
+`10.0.0.0/16` is the equivalent of `1234` as a password. You should consider other ranges that people might use to ensure it does not overlap.
 
 #### 1.5.1.6. Packets
 
@@ -1660,8 +1656,7 @@ TCP and UDP are protocols built on top of IP.
 
 TCP/UDP Segment has a source and destination port number.
 This allows devices to have multiple conversations at the same time.
-In AWS when data goes through network devices, filters can be set based on
-IP addresses and port numbers.
+In AWS when data goes through network devices, filters can be set based on IP addresses and port numbers.
 
 #### 1.5.1.7. IPv6 - RFC 8200 (2017)
 
@@ -1716,8 +1711,7 @@ An example using 4 AWS accounts.
 
 A subnet is located in one availability zone.
 Try to split each subnet into tiers (web, application, db, spare).
-Since each Region has at least 3 AZ's, it is a good practice to start
-splitting the network into 4 different AZs.
+Since each Region has at least 3 AZ's, it is a good practice to start splitting the network into 4 different AZs.
 This allows for at least one subnet in each AZ, and one spare.
 Taking a /16 subnet and splitting it 16 ways will make each a /20.
 
@@ -1727,14 +1721,12 @@ Taking a /16 subnet and splitting it 16 ways will make each a /20.
   - Operates from all AZs in that region
 - Allows isolated networks inside AWS.
 - Nothing IN or OUT of a VPC without explicit configuration.
-  - Isolated blast radius. Any problems are limited to that VPC or anything
-  connected to it.
+  - Isolated blast radius. Any problems are limited to that VPC or anything connected to it.
 - Flexible configuration
 - Hybrid networking to allow connection to other cloud or on-prem networking.
 - Default or Dedicated Tenancy. This refers to how the hardware is configured.
   - Default allows on a per resource decision later on.
-  - Dedicated locks any resourced created in that VPC to be on dedicated
-  hardware which comes at a cost premium.
+  - Dedicated locks any resourced created in that VPC to be on dedicated hardware which comes at a cost premium.
 
 #### 1.5.3.1. Custom VPC Facts
 
@@ -1752,10 +1744,8 @@ Single assigned IPv6 /56 CIDR block
 
 - Still being matured, not everything works the same as IPv4.
 - With increasing use of IPv6, this should be added as a default
-- Range is either allocated by AWS as in you have no choice on which range
-to use, or you can select to use your own IPv6 addresses which you own.
-- IPv6 does not have private addresses, they are all routed as public by
-default.
+- Range is either allocated by AWS as in you have no choice on which range to use, or you can select to use your own IPv6 addresses which you own.
+- IPv6 does not have private addresses, they are all routed as public by default.
 
 #### 1.5.3.2. DNS provided by R53
 
@@ -1800,9 +1790,7 @@ If using `10.16.16.0/20` (`10.16.16.0` - `10.16.31.255`)
 
 #### 1.5.4.2. DHCP Options Set
 
-This is how computing devices receive IP addresses automatically. There is
-one options set applied to a VPC at one time and this configuration flows
-through to subnets.
+This is how computing devices receive IP addresses automatically. There is one options set applied to a VPC at one time and this configuration flows through to subnets.
 
 - This can be changed, can create new ones, but you cannot edit one.
 - If you want to change the settings
@@ -1818,37 +1806,28 @@ through to subnets.
 - Auto Assign IPv6 address
   - For this to work, the subnet and VPC need an allocation of addresses.
 
-### 1.5.5. VPC Routing and Internet Gateway
+### 1.5.5. VPC Routing, Internet Gateway and Bastion Hosts
 
-VPC Router is a highly available device available in every VPC which moves
-traffic from somewhere to somewhere else.
+VPC Router is a highly available device available in every VPC which moves traffic from somewhere to somewhere else.
 Router has a network interface in every subnet in the VPC.
 Routes traffic between subnets.
 
-Route tables defines what the VPC router will do with traffic
-when data leaves that subnet.
-A VPC is created with a main route table. If you don't associate a custom
-route table with a subnet, it uses the main route table of the VPC.
+Route tables defines what the VPC router will do with traffic when data leaves that subnet.
+A VPC is created with a main route table. If you don't associate a custom route table with a subnet, it uses the main route table of the VPC.
 
-If you do associate a custom route table you create with a subnet, then the
-main route table is disassociated. A subnet can only have one route table
-associated at a time, but a route table can be associated by many subnets.
+If you do associate a custom route table you create with a subnet, then the main route table is disassociated. A subnet can only have one route table associated at a time, but a route table can be associated by many subnets.
 
 #### 1.5.5.1. Route Tables
 
-When traffic leaves the subnet that this route table is associated with, the
-VPC router reviews the IP packets looking for the destination address.
-The traffic will try to match the route against the route table. If there
-are more than one routes found as a match, the prefix is used as a priority.
+When traffic leaves the subnet that this route table is associated with, the VPC router reviews the IP packets looking for the destination address.
+The traffic will try to match the route against the route table. If there are more than one routes found as a match, the prefix is used as a priority.
 The higher the prefix, the more specific the route, thus higher priority.
 If the target says local, that means the destination is in the VPC itself.
-Local route can never be updated, they're always present and the local route
-always takes priority. This is the exception to the prefix rule.
+Local route can never be updated, they're always present and the local route always takes priority. This is the exception to the prefix rule.
 
 #### 1.5.5.2. Internet Gateway
 
-A managed service that allows gateway traffic between the VPC and the internet
-or AWS Public Zones (S3, SQS, SNS, etc.)
+A managed service that allows gateway traffic between the VPC and the internet or AWS Public Zones (S3, SQS, SNS, etc.)
 
 - Regional resilient gateway attached to a VPC.
 - One IGW will cover all AZ's in a region the VPC is using.
@@ -1866,29 +1845,19 @@ In this example, an EC2 instance has:
 - Public address of 43.250.192.20
 
 The public address is not public and connected to the EC2 instance itself.
-Instead, the IGW creates a record that links the instance's private IP
-to the public IP. This is why when an EC2 instance is created it only
-sees the private IP address. This is IMPORTANT. For IPv4 it is not configured
-in the OS with the public address.
+Instead, the IGW creates a record that links the instance's private IP to the public IP. This is why when an EC2 instance is created it only sees the private IP address. This is IMPORTANT. For IPv4 it is not configured in the OS with the public address.
 
-When the linux instance wants to communicate with the linux update service,
-it makes a packet of data.
-The packet has a source address of the EC2 instance and a destination address
-of the linux update server. At this point the packet is not configured with
-any public addressing and could not reach the linux update server.
+When the linux instance wants to communicate with the linux update service, it makes a packet of data.
+The packet has a source address of the EC2 instance and a destination address of the linux update server. At this point the packet is not configured with any public addressing and could not reach the linux update server.
 
 The packet arrives at the internet gateway.
 
 The IGW sees this is from the EC2 instance and analyzes the source IP address.
-It changes the packet source IP address from the linux EC2 server and puts
-on the public IP address that is routed from that instance. The IGW then
-pushes that packet on the public internet.
+It changes the packet source IP address from the linux EC2 server and puts on the public IP address that is routed from that instance. The IGW then pushes that packet on the public internet.
 
-On the return, the inverse happens. As far as it is concerned, it does not know
-about the private address and instead uses the instance's public IP address.
+On the return, the inverse happens. As far as it is concerned, it does not know about the private address and instead uses the instance's public IP address.
 
-If the instance uses an IPv6 address, that public address is good to go. The IGW
-does not translate the packet and only pushes it to a gateway.
+If the instance uses an IPv6 address, that public address is good to go. The IGW does not translate the packet and only pushes it to a gateway.
 
 #### 1.5.5.4. Bastion Host / Jumpbox
 
@@ -1897,28 +1866,21 @@ These are used to allow incoming management connections.
 Once connected, you can then go on to access internal only VPC resources.
 Used as a management point or as an entry point for a private only VPC.
 
-This is an inbound management point. Can be configured to only allow
-specific IP addresses or to authenticate with SSH. It can also integrate
-with your on premise identification service.
+This is an inbound management point. Can be configured to only allow specific IP addresses or to authenticate with SSH. It can also integrate with your on premise identification service.
 
 ### 1.5.6. Network Access Control List (NACL)
 
-Network Access Control Lists (NACLs) are a type of security filter
-(like firewalls) which can filter traffic as it enters or leaves a **subnet**.
+Network Access Control Lists (NACLs) are a type of security filter (like firewalls) which can filter traffic as it enters or leaves a **subnet**.
 
 All VPCs have a default NACL, this is associated with all subnets of that VPC by default.
 NACLs are used when traffic enters or leaves a subnet.
-Since they are attached to a subnet and not a resource, they only filter
-data as it crosses in or out.
-If two EC2 instances in a subnet communicate, the NACL does nothing because
-it is not involved.
+Since they are attached to a subnet and not a resource, they only filter data as it crosses in or out.
+If two EC2 instances in a subnet communicate, the NACL does nothing because it is not involved.
 
 NACLs have an inbound and outbound sets of rules.
 
-When a specific rule set has been called, the one with the lowest
-rule number first.
-As soon as one rule is matched, the processing stops for
-that particular piece of traffic.
+When a specific rule set has been called, the one with the lowest rule number first.
+As soon as one rule is matched, the processing stops for that particular piece of traffic.
 
 The action can be for the traffic to **allow** or **deny** the traffic.
 
@@ -1957,30 +1919,22 @@ If no other rules match the traffic being evaluated, it will be denied.
 - Bob's PC tells the server it can talk to back to Bob on a specific port
   - Wide range from port 1024, 65535
   - That response is outbound traffic
-- When using NACLs, you must add an outbound port for the response traffic
-as well as the inbound port. This is the ephemeral port.
-- If the webserver is not managing the apps server, it may communicate
-back on a different port.
+- When using NACLs, you must add an outbound port for the response traffic as well as the inbound port. This is the ephemeral port.
+- If the webserver is not managing the apps server, it may communicate back on a different port.
 - This back and forth communication can be hard to configure for.
 
 #### 1.5.6.2. NACL Exam PowerUp
 
 - NACLs are stateless
   - Initiation and response traffic are separate streams requiring two rules.
-- NACLs are attached to subnets and only filter data as it crosses the
-subnet boundary. Two EC2 instances in the same subnet will not check against
-the NACLs when moving data.
-- Can explicitly allow and deny traffic. If you need to block one particular
-thing, you need to use NACLs.
-- They only see IPs, ports, protocols, and other network connections.
-No logical resources can be changed with them.
+- NACLs are attached to subnets and only filter data as it crosses the subnet boundary. Two EC2 instances in the same subnet will not check against the NACLs when moving data.
+- Can explicitly allow and deny traffic. If you need to block one particular thing, you need to use NACLs.
+- They only see IPs, ports, protocols, and other network connections. No logical resources can be changed with them.
 - NACLs cannot be assigned to specific AWS resources.
 - NACLs can be used with security groups to add explicit deny (Bad IPs/nets)
 - One subnet can only be assigned to one NACL at a time. But a NACL can be assigned to multiple subnets.
 
-NACLs are processed in order starting at the lowest rule number until
-it gets to the catch all. A rule with a lower rule number will be processed
-before another rule with a higher rule number.
+NACLs are processed in order starting at the lowest rule number until it gets to the catch all. A rule with a lower rule number will be processed before another rule with a higher rule number.
 
 ### 1.5.7. Security Groups
 
@@ -2008,17 +1962,13 @@ before another rule with a higher rule number.
 
 ### 1.5.8. Network Address Translation (NAT) Gateway
 
-Set of different processes that can address IP packets by changing
-their source or destination addresses.
+Set of different processes that can address IP packets by changing their source or destination addresses.
 
-**IP masquerading**, hides CIDR block behind one IP. This allows many IPv4
-addresses to use one public IP for **outgoing** internet access.
-Incoming connections don't work. Outgoing connections can get a response
-returned.
+**IP masquerading**, hides CIDR block behind one IP. This allows many IPv4 addresses to use one public IP for **outgoing** internet access.
+Incoming connections don't work. Outgoing connections can get a response returned.
 
 - Must run from a public subnet to allow for public IP address.
-  - Internet Gateway subnets configure to allocate public IPv4 addresses
-  and default routes for those subnets pointing at the IGW.
+  - Internet Gateway subnets configure to allocate public IPv4 addresses and default routes for those subnets pointing at the IGW.
 - Uses Elastic IPs (Static IPv4 Public)
   - Don't change
   - Allocated to your account
@@ -2063,37 +2013,25 @@ Host OS operated on the HW and included a hypervisor (HV).
 SW ran in privileged mode and had full access to the HW.
 Guest OS wrapped in a VM and had devices mapped into their OS to emulate real HW. Drivers such as graphics cards were all SW emulated to allow the process to run properly.
 
-The guest OS still believed they were running on real HW and tried
-to take control of the HW. The areas were not real and only allocated
-space to them for the moment.
+The guest OS still believed they were running on real HW and tried to take control of the HW. The areas were not real and only allocated space to them for the moment.
 
 The HV performs **binary translation**.
 System calls are intercepted and translated in SW on the way. The guest OS needs no modification, but slows down a lot.
 
 #### 1.6.1.2. Para-Virtualization
 
-Guest OS are modified and run in HV containers, except they do not use slow
-binary translation. The OS is modified to change the **system calls** to
-**user calls**. Instead of calling on the HW, they call on the HV using
-**hypercalls**. Areas of the OS call the HV instead of the HW.
+Guest OS are modified and run in HV containers, except they do not use slow binary translation. The OS is modified to change the **system calls** to **user calls**. Instead of calling on the HW, they call on the HV using **hypercalls**. Areas of the OS call the HV instead of the HW.
 
 #### 1.6.1.3. Hardware Assisted Virtualization
 
-The physical HW itself is virtualization aware. The CPU has specific
-functions so the HV can come in and support. When guest OS tries to run
-privileged instructions, they are trapped by the CPU and do not halt
-the process. They are redirected to the HV from the HW.
+The physical HW itself is virtualization aware. The CPU has specific functions so the HV can come in and support. When guest OS tries to run privileged instructions, they are trapped by the CPU and do not halt the process. They are redirected to the HV from the HW.
 
-What matters for a VM is the input and output operations such
-as network transfer and disk IO. The problem is multiple OS try to access
-the same piece of hardware but they get caught up on sharing.
+What matters for a VM is the input and output operations such as network transfer and disk IO. The problem is multiple OS try to access the same piece of hardware but they get caught up on sharing.
 
 #### 1.6.1.4. SR-IOV (Single Root I/O Virtualization)
 
 Allows a network or any card to present itself as many mini cards.
-As far as the HV is concerned, they are real dedicated cards for their
-use. No translation needs to be done by the HV. The physical card
-handles it all. In EC2 this feature is called **enhanced networking**.
+As far as the HV is concerned, they are real dedicated cards for their use. No translation needs to be done by the HV. The physical card handles it all. In EC2 this feature is called **enhanced networking**.
 
 ### 1.6.2. EC2 Architecture and Resilience
 
@@ -2122,21 +2060,14 @@ within the same AZ.
 
 EC2 Networking (ENI)
 
-When instances are provisioned within a specific subnet within a VPC
-A primary elastic network interface is provisioned in a subnet which
-maps to the physical hardware on the EC2 host. Subnets are also within
-one specific AZ. Instances can have multiple network interfaces, even within
-different subnets so long as they're within the same AZ.
+When instances are provisioned within a specific subnet within a VPC a primary elastic network interface is provisioned in a subnet which maps to the physical hardware on the EC2 host. Subnets are also within one specific AZ. Instances can have multiple network interfaces, even within different subnets so long as they're within the same AZ.
 
-An instance runs on a specific host. If you restart the instance
-it will stay on that host until either:
+An instance runs on a specific host. If you restart the instance it will stay on that host until either:
 
 - The host fails or is taken down by AWS
 - The instance is stopped and then started, different than restarted.
 
-The instance will be relocated to another host in the same AZ. Instances
-cannot move to different AZs. Everything about their hardware is locked within
-one specific AZ.
+The instance will be relocated to another host in the same AZ. Instances cannot move to different AZs. Everything about their hardware is locked within one specific AZ.
 A migration is taking a **copy** of an instance and moving it to a different AZ.
 
 In general instances of the same type and generation will occupy the same host.
@@ -2166,8 +2097,7 @@ Server style applications
 
 #### 1.6.3.1. Naming Scheme
 
-R5dn.8xlarge - whole thing is the instance type. When in doubt give the
-full instance type
+R5dn.8xlarge - whole thing is the instance type. When in doubt give the full instance type
 
 - 1st char: Instance family.
 - 2nd char: Instance generation. Generally always select the newest generation.
@@ -2192,21 +2122,11 @@ full instance type
 
 #### 1.6.4.1. Three types of storage
 
-- Block Storage: Volume presented to the OS as a collection of blocks. No
-structure beyond that. These are mountable and bootable. The OS will
-create a file system on top of this, NTFS or EXT3 and then it mounts
-it as a drive or a root volume on Linux. Spinning hard disks or SSD. This
-could also be delivered by a physical volume. Has no built in structure.
-You can mount an EBS volume or boot off an EBS volume.
+- Block Storage: Volume presented to the OS as a collection of blocks. No structure beyond that. These are mountable and bootable. The OS will create a file system on top of this, NTFS or EXT3 and then it mounts it as a drive or a root volume on Linux. Spinning hard disks or SSD. This could also be delivered by a physical volume. Has no built in structure. You can mount an EBS volume or boot off an EBS volume.
 
-- File Storage: Presented as a file share with a structure. You access the
-files by traversing the storage. You cannot boot from storage, but you
-can mount it.
+- File Storage: Presented as a file share with a structure. You access the files by traversing the storage. You cannot boot from storage, but you can mount it.
 
-- Object Storage (S3): It is a flat collection of objects. An object can be anything
-with or without attached metadata. To retrieve the object, you need to provide
-the key and then the value will be returned. This is not mountable or
-bootable. It scales very well and can have simultaneous access.
+- Object Storage (S3): It is a flat collection of objects. An object can be anything with or without attached metadata. To retrieve the object, you need to provide the key and then the value will be returned. This is not mountable or bootable. It scales very well and can have simultaneous access.
 
 #### 1.6.4.2. Storage Performance
 
@@ -2217,8 +2137,7 @@ bootable. It scales very well and can have simultaneous access.
 `Block Size * IOPS = Throughput`
 
 This isn't the only part of the chain, but it is a simplification.
-A system might have a throughput cap. The IOPS might decrease as the block
-size increases.
+A system might have a throughput cap. The IOPS might decrease as the block size increases.
 
 ### 1.6.5. Elastic Block Store (EBS)
 
@@ -2297,8 +2216,7 @@ Two types
 
 - Volumes are created in an AZ, isolated in that AZ.
 - If an AZ fails, the volume is impacted.
-- Highly available and resilient in that AZ. The only reason for failure is
-if the whole AZ fails.
+- Highly available and resilient in that AZ. The only reason for failure is if the whole AZ fails.
 - Generally one volume to one instance, except **io1** with multi-attach
 - Has a GB/m fee regardless of instance state.
 - EBS maxes at 80k IOPS per instance and 64k vol (io1)
@@ -2314,8 +2232,7 @@ if the whole AZ fails.
 - Included in instance price, use it or lose it.
 - Can be attached ONLY at launch. Cannot be attached later.
 
-Each instance has a collection of volumes that are
-locked to that specific host. If the instance moves, the data doesn't.
+Each instance has a collection of volumes that are locked to that specific host. If the instance moves, the data doesn't.
 
 Instances can move between hosts for many reasons:
 
@@ -2324,9 +2241,7 @@ Instances can move between hosts for many reasons:
 - If you change the type of an instance, these will be lost.
 - If a physical hardware fails, then the data is gone.
 
-The number, size, and performance of instance store volumes vary based on the
-type of instance used. Some instances do not have any instance store volumes
-at all.
+The number, size, and performance of instance store volumes vary based on the type of instance used. Some instances do not have any instance store volumes at all.
 
 #### 1.6.6.1. Instance Store Exam PowerUp
 
@@ -2373,8 +2288,7 @@ The first is a **full copy** of `data` on the volume. This can take some time.
 EBS won't be impacted, but will take time in the background.
 Future snaps are incremental, consume less space and are quicker to perform.
 
-If you delete an incremental snapshot, it moves data to ensure subsequent
-snapshots will work properly.
+If you delete an incremental snapshot, it moves data to ensure subsequent snapshots will work properly.
 
 Volumes can be created (restored) from snapshots.
 Snapshots can be used to move EBS volumes between AZs.
@@ -2382,8 +2296,7 @@ Snapshots can be used to migrate data between volumes.
 
 #### 1.6.8.1. Snapshot and volume performance
 
-- When creating a new EBS volume without a snapshot, the performance is
-available immediately.
+- When creating a new EBS volume without a snapshot, the performance is available immediately.
 - When restoring from S3, performs **Lazy Restore**
   - If you restore a volume, it will transfer it slowly in the background.
   - If you attempt to read data that hasn't been restored yet, it will
@@ -2392,8 +2305,7 @@ available immediately.
   - You can force a read of every block of data immediately using `dd` (linux command).
 
 Fast Snapshot Restore (FSR) allows for immediate restoration.
-You can create 50 of these FSRs per region. When you enable it on a snapshot, you pick the snapshot specifically and the AZ that you want to be able to do instant restores to. Each combination of Snapshot and AZ counts
-as one FSR set. You can have 50 FSR sets per region.
+You can create 50 of these FSRs per region. When you enable it on a snapshot, you pick the snapshot specifically and the AZ that you want to be able to do instant restores to. Each combination of Snapshot and AZ counts as one FSR set. You can have 50 FSR sets per region.
 FSR is not free and can get expensive with lost of different snapshots.
 
 #### 1.6.8.2. Snapshot Consumption and Billing
@@ -2401,8 +2313,7 @@ FSR is not free and can get expensive with lost of different snapshots.
 Billed using a GB/month metric.
 20 GB stored for half a month, represents 10 GB-month.
 
-This is used data, not allocated data. If you have a 40 GB volume but only
-use 10 GB, you will only be charged for the allocated data.
+This is used data, not allocated data. If you have a 40 GB volume but only use 10 GB, you will only be charged for the allocated data.
 This is not how EBS itself works.
 
 The data is incrementally stored which means doing a snapshot every 5 minutes will not necessarily increase the charge as opposed to doing one every hour.
@@ -2412,34 +2323,24 @@ The data is incrementally stored which means doing a snapshot every 5 minutes wi
 Provides at rest encryption for block volumes and snapshots.
 
 When you don't have EBS encryption, the volume is not encrypted.
-The physical hardware itself may be performing at rest encryption, but
-that is a separate thing.
+The physical hardware itself may be performing at rest encryption, but that is a separate thing.
 
 When you set up an EBS volume initially, EBS uses KMS and a customer master key.
-This can be the EBS default (CMK) which is referred to as `aws/ebs` or it
-could be a customer managed CMK which you manage yourself.
+This can be the EBS default (CMK) which is referred to as `aws/ebs` or it could be a customer managed CMK which you manage yourself.
 
 That key is used by EBS when an encrypted volume is created. The CMK generates an encrypted **data encryption key (DEK)** which is stored with the volume with on the physical disk. This key can only be decrypted using KMS with a role with the proper permissions to decrypt that DEK.
 
-When the volume is first used, EBS asks CMS to decrypt the key and stores
-the decrypted key in memory on the EC2 host while it's being used. At all
-other times it's stored on the volume in encrypted form.
+When the volume is first used, EBS asks CMS to decrypt the key and stores the decrypted key in memory on the EC2 host while it's being used. At all other times it's stored on the volume in encrypted form.
 
-When the EC2 instance is using the encrypted volume, it can use the
-decrypted data encryption key to move data on and off the volume. It is used
-for all cryptographic operations when data is being used to and from the
-volume.
+When the EC2 instance is using the encrypted volume, it can use the decrypted data encryption key to move data on and off the volume. It is used for all cryptographic operations when data is being used to and from the volume.
 
 When data is stored at rest, it is stored as ciphertext.
 
 If the EBS volume is ever moved, the key is discarded.
 
-If a snapshot is made of an encrypted EBS volume, the same data encryption
-key is used for that snapshot. Anything made from this snapshot is also
-encrypted in the same way.
+If a snapshot is made of an encrypted EBS volume, the same data encryption key is used for that snapshot. Anything made from this snapshot is also encrypted in the same way.
 
-Every time you create a new EBS volume from scratch, it creates a new
-data encryption key.
+Every time you create a new EBS volume from scratch, it creates a new data encryption key.
 
 ##### 1.6.8.3.1. EBS Encryption Exam Power Up
 
@@ -2460,11 +2361,9 @@ data encryption key.
 ### 1.6.9. EC2 Network Interfaces, Instance IPs and DNS
 
 An EC2 instance starts with at least one ENI - Elastic Network Interface.
-An instance may have ENIs in separate subnets, but everything must be
-within one AZ.
+An instance may have ENIs in separate subnets, but everything must be within one AZ.
 
-When you launch an instance with Security Groups, they are on the
-network interface and not the instance.
+When you launch an instance with Security Groups, they are on the network interface and not the instance.
 
 #### 1.6.9.1. Elastic Network Interface (ENI)
 
@@ -2506,10 +2405,7 @@ Secondary interfaces function in all the same ways as primary interfaces except 
 - Never configure an OS with a public IPv4 address.
 - IPv4 Public IPs are Dynamic, starting and stopping will kill it.
 
-Public DNS for a given instance will resolve to the primary private IP
-address in a VPC. If you have instance to instance communication within
-the VPC, it will never leave the VPC. It does not need to touch the internet
-gateway.
+Public DNS for a given instance will resolve to the primary private IP address in a VPC. If you have instance to instance communication within the VPC, it will never leave the VPC. It does not need to touch the internet gateway.
 
 ### 1.6.10. Amazon Machine Image (AMI)
 
@@ -2552,8 +2448,7 @@ Images of EC2 instances that can launch more EC2 instance.
 
 - AMI can only be used in one region
 - AMI Baking: creating an AMI from a configuration instance.
-- An AMI cannot be edited. If you need to update an AMI, launch an instance,
-make changes, then make new AMI
+- An AMI cannot be edited. If you need to update an AMI, launch an instance, make changes, then make new AMI
 - Can be copied between regions
 - Remember permissions by default are your account only
 - Billing is for the storage capacity for the EBS snapshots the AMI references.
@@ -2574,8 +2469,7 @@ make changes, then make new AMI
 
 Up to 90% off on-demand, but depends on the spare capacity.
 You can set a maximum hourly rate in a certain AZ in a certain region.
-If the max price you set is above the spot price, you pay only that spot
-price for the duration that you consume that instance.
+If the max price you set is above the spot price, you pay only that spot price for the duration that you consume that instance.
 As the spot price increases, you pay more.
 Once this price increases past your maximum, it will terminate the instance.
 Great for data analytics when the process can occur later at a lower use time.
@@ -2638,8 +2532,7 @@ This requires a load balancer.
 
 > A load balancer is an _appliance_ that sits in between your servers -- in this case instances -- and your customers.
 
-When customers try to access an application, the load balancer ensures the
-servers get equal parts of the load.
+When customers try to access an application, the load balancer ensures the servers get equal parts of the load.
 
 - Sessions are everything.
   - When you log into youtube, netflix or your email, the state of your interaction with that application is called a *session*.
@@ -2668,8 +2561,7 @@ Meta-data contains information on the:
 
 - environment the instance is in.
 - You can find out about the networking or user-data among other things.
-- This is not authenticated or encrypted. Anyone who can gain access to the
-instance can see the meta-data. This can be restricted by local firewall
+- This is not authenticated or encrypted. Anyone who can gain access to the instance can see the meta-data. This can be restricted by local firewall
 
 ---
 
@@ -2679,8 +2571,7 @@ instance can see the meta-data. This can be restricted by local firewall
 
 Virtualization Problems
 
-Using an EC2 virtual machine with Nitro Hypervisor, 4 GB ram, and 40 GB disk,
-the OS can consume 60-70% of the disk and much of the available memory.
+Using an EC2 virtual machine with Nitro Hypervisor, 4 GB ram, and 40 GB disk, the OS can consume 60-70% of the disk and much of the available memory.
 Containers leverage the similarities of multiple guest OS by removing duplicate resources. This allows applications to run in their own isolated environments.
 
 #### 1.7.1.1. Image Anatomy
@@ -2752,29 +2643,23 @@ ECS Cluster manages:
 
 #### 1.7.3.1. EC2 mode
 
-ECS cluster is created within a VPC. It benefits from the multiple AZs that
-are within that VPC.
+ECS cluster is created within a VPC. It benefits from the multiple AZs that are within that VPC.
 You specify an initial size which will drive an **auto scaling group**.
 
-ECS using EC2 mode is not a serverless solution, you need to worry about
-capacity and availability for your cluster.
+ECS using EC2 mode is not a serverless solution, you need to worry about capacity and availability for your cluster.
 
-The container instances are not delivered as a managed service, they
-are managed as normal EC2 instances.
+The container instances are not delivered as a managed service, they are managed as normal EC2 instances.
 You can use spot pricing or prepaid EC2 servers.
 
 #### 1.7.3.2. Fargate mode
 
 Removes more of the management overhead from ECS, no need to manage EC2.
 
-**Fargate shared infrastructure** allows all customers
-to access from the same pool of resources.
+**Fargate shared infrastructure** allows all customers to access from the same pool of resources.
 
 Fargate deployment still uses a cluster with a VPC where AZs are specified.
 
-For ECS tasks, they are injected into the VPC. Each task is given an
-_elastic network interface_ which has an IP address within the VPC. They then
-run like a VPC resource.
+For ECS tasks, they are injected into the VPC. Each task is given an _elastic network interface_ which has an IP address within the VPC. They then run like a VPC resource.
 
 You only pay for the container resources you use.
 
@@ -2797,37 +2682,30 @@ This allows for spot pricing and prepayment.
 
 ### 1.8.1. Bootstrapping EC2 using User Data
 
-Bootstrapping is a process where scripts or other config steps can be run when
-an instance is first launched. This allows an instance to be brought to service
-in a particular configured state.
+Bootstrapping is a process where scripts or other config steps can be run when an instance is first launched. This allows an instance to be brought to service in a particular configured state.
 
 In systems automation, bootstrapping allows the system to self configure.
 In AWS this is **EC2 Build Automation**.
 
 This could perform some software installs and post install configs.
 
-Bootstrapping is done using **user data** and is injected into the instance
-in the same way that meta-data is. It is accessed using the meta-data IP.
+Bootstrapping is done using **user data** and is injected into the instance in the same way that meta-data is. It is accessed using the meta-data IP.
 
 <http://169.254.169.254/latest/user-data>
 
 Anything you pass in is executed by the instance OS **only once on launch!** It is for launch time configuration only.
 
-EC2 doesn't validate the user data. You can tell EC2 to pass in trash data
-and the data will be injected. The OS needs to understand the user data.
+EC2 doesn't validate the user data. You can tell EC2 to pass in trash data and the data will be injected. The OS needs to understand the user data.
 
 #### 1.8.1.1. Bootstrapping Architecture
 
-An AMI is used to launch an EC2 instance in the usual way to create
-an EBS volume that is attached to the EC2 instance. This is based on the
-block mapping inside the AMI.
+An AMI is used to launch an EC2 instance in the usual way to create an EBS volume that is attached to the EC2 instance. This is based on the block mapping inside the AMI.
 
 Now the EC2 service provides some user data through to the EC2 instance.
 There is SW within the OS designed to look at the metadata IP for any user data.
 If it sees any user data, it executes this on launch of that instance.
 
-This is treated like any other script the OS runs. At the end of running
-the script, the instance will be in:
+This is treated like any other script the OS runs. At the end of running the script, the instance will be in:
 
 - Running state and ready for service.
 - Bad config but still likely running.
@@ -2837,21 +2715,16 @@ the script, the instance will be in:
 #### 1.8.1.2. User Data Key Points
 
 EC2 doesn't know what the user data contains, it's just a block of data.
-The user data is not secure, anyone can see what gets passed in. For this
-reason it is important not to pass passwords or long term credentials.
+The user data is not secure, anyone can see what gets passed in. For this reason it is important not to pass passwords or long term credentials.
 
-**User data is limited to 16 KB in size**. Anything larger than this will
-need to pass a script to download the larger set of data.
+**User data is limited to 16 KB in size**. Anything larger than this will need to pass a script to download the larger set of data.
 
-User data can be modified if you stop the instance, change the user
-data, then restart the instance. This won't be executed since the instance
-has already started.
+User data can be modified if you stop the instance, change the user data, then restart the instance. This won't be executed since the instance has already started.
 
 #### 1.8.1.3. Boot-Time-To-Service-Time
 
 How quickly after you launch an instance is it ready for service?
-This includes the time for EC2 to configure the instance and any software
-downloads that are needed for the user.
+This includes the time for EC2 to configure the instance and any software downloads that are needed for the user.
 When looking at an AMI, this can be measured in minutes.
 
 AMI baking will front load the time needed by configuring as much as possible.
@@ -2868,15 +2741,11 @@ This is a simple configuration management system.
 
 - User Data is procedural and run by the OS line by line.
 - cfn-init can be procedural, but can also be desired state.
-  - Can specify particular versions of packages. It will ensure things are
-  configured to that end state.
+  - Can specify particular versions of packages. It will ensure things are configured to that end state.
   - Can manipulate OS groups and users.
   - Can download sources and extract them using authentication.
 
-This is executed as any other command by being passed into the instance as part
-of the user data and retrieves its directives from the CloudFormation
-stack and you define this data in the CloudFormation template called
-`AWS::CloudFormation::Init`.
+This is executed as any other command by being passed into the instance as part of the user data and retrieves its directives from the CloudFormation stack and you define this data in the CloudFormation template called `AWS::CloudFormation::Init`.
 
 #### 1.8.2.1. cfn-init explained
 
@@ -2891,32 +2760,23 @@ This can monitor the user data and change things as the EC2 data changes.
 
 #### 1.8.2.2. CreationPolicy and Signals
 
-If you pass in user data, there is no way for CloudFormation to know
-if the EC2 instance was provisioned properly. It may be marked as complete,
-but the instance could be broken.
+If you pass in user data, there is no way for CloudFormation to know if the EC2 instance was provisioned properly. It may be marked as complete, but the instance could be broken.
 
-A **CreationPolicy** is something which is added to a logical resource
-inside a CloudFormation template. You create it and supply a timeout value.
+A **CreationPolicy** is something which is added to a logical resource inside a CloudFormation template. You create it and supply a timeout value.
 
-This waits for a signal from the resource itself before moving to a create
-complete state.
+This waits for a signal from the resource itself before moving to a create complete state.
 
-### 1.8.3. EC2 Instance Roles
+### 1.8.3. EC2 Instance Roles and Profile
 
 IAM roles are the best practice ways for services to be granted permissions.
-EC2 instance roles are roles that an instance can assume and anything
-running in that instance has the permissions that role grants.
+EC2 instance roles are roles that an instance can assume and anything running in that instance has the permissions that role grants.
 
 Starts with an IAM role with a permissions policy.
 EC2 instance role allows the EC2 service to assume that role.
 
-The **instance profile** is the item that allows the permissions to get
-inside the instance. When you create an instance role in the console,
-an instance profile is created with the same name.
+The **instance profile** is the item that allows the permissions to get inside the instance. When you create an instance role in the console, an instance profile is created with the same name.
 
-When IAM roles are assumed, you are provided temporary roles based on the
-permission assigned to that role. These credentials are passed through
-instance **meta-data**.
+When IAM roles are assumed, you are provided temporary roles based on the permission assigned to that role. These credentials are passed through instance **meta-data**.
 
 EC2 and the secure token service ensure the credentials never expire.
 
@@ -2931,8 +2791,7 @@ Key facts
 
 ### 1.8.4. AWS System Manager Parameter Store
 
-Passing secrets into an EC2 instance is bad practice because anyone
-who has access to the meta-data has access to the secrets.
+Passing secrets into an EC2 instance is bad practice because anyone who has access to the meta-data has access to the secrets.
 
 Parameter store allows for storage of **configuration** and **secrets**
 
@@ -2946,12 +2805,9 @@ Parameter Store:
 - Allows for hierarchies and versioning.
 - Can store plaintext and ciphertext.
   - This integrates with **kms** to encrypt passwords.
-- Allows for public parameters such as the latest AMI parameter to be stored
-and referenced during EC2 creation
-- Is a public service so any services needs access to the public sphere or
-to be an AWS public service.
-- Applications, EC2 instances, lambda functions can all request access to
-parameter store.
+- Allows for public parameters such as the latest AMI parameter to be stored and referenced during EC2 creation
+- Is a public service so any services needs access to the public sphere or to be an AWS public service.
+- Applications, EC2 instances, lambda functions can all request access to parameter store.
 - Tied closely to IAM, can use
   - Long term credentials such as access keys.
   - Short term use of IAM roles.
@@ -2987,11 +2843,9 @@ Designed so that instances within the same cluster are physically close together
 Achieves the highest level of performance possible inside EC2.
 
 Best practice is to launch all of the instances within that group at the same time.
-If you launch with 9 instances and AWS places you in a place with capacity
-for 12, you are now limited in how many you can add.
+If you launch with 9 instances and AWS places you in a place with capacity for 12, you are now limited in how many you can add.
 
-Cluster placements need to be part of the same AZ. Cluster
-placement groups are generally the same rack, but they can even be the same
+Cluster placements need to be part of the same AZ. Cluster placement groups are generally the same rack, but they can even be the same
 EC2 host.
 
 All members have direct connections to each other. They can achieve
@@ -3000,6 +2854,7 @@ latency and max packets-per-second (PPS) possible in AWS.
 
 If the hardware fails, the entire cluster will fail.
 
+![Cluster Placement Group](Learning-Aids/10-Advanced-EC2/ClusterPlacementGroup.png)
 ##### 1.8.6.1.1. Cluster Placement Exam PowerUp
 
 - **Clusters can't span AZs**. The first AZ used will lock down the cluster.
@@ -3015,10 +2870,9 @@ If the hardware fails, the entire cluster will fail.
 Keep instances separated
 
 This provides the best resilience and availability.
-Spread groups can span multiple AZs. Information will be put on distinct
-racks with their own network or power supply. There is a limit of 7 instances
-per AZ. The more AZs in a region, the more instances inside a spread placement group.
+Spread groups can span multiple AZs. Information will be put on distinct racks with their own network or power supply. There is a limit of 7 instances per AZ. The more AZs in a region, the more instances inside a spread placement group.
 
+![Spread Placement Group](Learning-Aids/10-Advanced-EC2/SpreadPlacementGroup.png)
 ##### 1.8.6.2.1. Spread Placement Exam PowerUp
 
 - Provides the highest level of availability and resilience.
@@ -3027,20 +2881,17 @@ per AZ. The more AZs in a region, the more instances inside a spread placement g
 - Not supported for dedicated instances or hosts.
 
 - Use case: small number of critical instances that need to be kept separated from each other. Several mirrors of an application; different nodes of an application; etc.
-
 #### 1.8.6.3. Partition Placement -> Groups of Instances Spread Apart
 
 Groups of instances spread apart
 
-If a problem occurs with one rack's networking or power, it will
-at most take out one instance.
+If a problem occurs with one rack's networking or power, it will at most take out one instance.
 
-The main difference is you can launch as many instances in each partition
-as you desire.
+The main difference is you can launch as many instances in each partition as you desire.
 
-When you launch a partition group, you can allow AWS decide or you can
-specifically decide.
+When you launch a partition group, you can allow AWS decide or you can specifically decide.
 
+![Partition Placement Group](Learning-Aids/10-Advanced-EC2/PartitionPlacementGroup.png)
 ##### 1.8.6.3.1. Partition Placement Exam PowerUp
 
 - 7 partitions maximum for each AZ
@@ -3055,12 +2906,9 @@ Pay for the host itself which is designed for a family of instances.
 There are no instance charges.
 You can pay for a host on-demand or reservation with 1 or 3 year terms.
 
-The host hardware has physical sockets and cores. This dictates how
-many instances can be run on the HW.
+The host hardware has physical sockets and cores. This dictates how many instances can be run on the HW.
 
-Hosts are designed for a specific size and family. If you purchase one host, you configure what type of instances you want to run on it. With the older VM
-system you cannot mix and match. The new Nitro system allows for mixing and
-matching host size.
+Hosts are designed for a specific size and family. If you purchase one host, you configure what type of instances you want to run on it. With the older VM system you cannot mix and match. The new Nitro system allows for mixing and matching host size.
 
 #### 1.8.7.1. Dedicated Hosts Limitations
 
@@ -3074,8 +2922,7 @@ matching host size.
 
 Enhanced networking uses SR-IOV (single root I/O virtualization).
 The physical network interface is aware of the virtualization.
-Each instance is given exclusive access to one part of a physical network
-interface card.
+Each instance is given exclusive access to one part of a physical network interface card.
 
 There is no charge for this and is available on most EC2 types.
 It allows for higher IO and lower host CPU usage
@@ -3084,11 +2931,9 @@ In general this provides lower latency.
 
 #### 1.8.8.1. EBS Optimized
 
-Historically network on EC2 was shared with the same network stack used
-for both data networking and EBS storage networking.
+Historically network on EC2 was shared with the same network stack used for both data networking and EBS storage networking.
 
-EBS optimized instance means that some stack optimizations have taken place
-and dedicated capacity has been provided for that instance for EBS usage.
+EBS optimized instance means that some stack optimizations have taken place and dedicated capacity has been provided for that instance for EBS usage.
 
 Most new instances support this and have this enabled by default for no charge.
 
