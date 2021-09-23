@@ -2944,17 +2944,13 @@ Most new instances support this and have this enabled by default for no charge.
 ### 1.9.1. Public Hosted Zones
 
 A hosted zone is a DNS database for a given section of global DNS data.
-A public hosted zone is a type of R53 hosted zone which is hosted on
-R53 provided public DNS name servers. When creating a hosted zone, AWS provides at least 4 DNS name servers which host the zone.
+A public hosted zone is a type of R53 hosted zone which is hosted on R53 provided public DNS name servers. When creating a hosted zone, AWS provides at least 4 DNS name servers which host the zone.
 
 This is globally resilient service due to multiple DNS servers.
 
 Hosted zones are created automatically when you register a domain using R53.
 
-Hosted zones can be created separately. If you want to register a domain
-elsewhere and use R53 to host the zone file and records for that domain, then
-you can specifically create a hosted zone and point at an externally
-registered domain at that zone.
+Hosted zones can be created separately. If you want to register a domain elsewhere and use R53 to host the zone file and records for that domain, then you can specifically create a hosted zone and point at an externally registered domain at that zone.
 There is a monthly fee to host each hosted zone within R53 and a fee for
 any queries made to that service.
 
@@ -2968,25 +2964,35 @@ VPC instances are already configured (if enabled) with the VPC +2 address as the
 Same as public hosted zones except these are not public.
 They are associated with VPCs and are only accesible within those VPCs via the R53 resolver.
 
-It's possible to use a technique called Split-view for public and internal use with the same zone name. A common architecure is to make the public hosted zone a subset of the private hosted zone
-containing only those records that are meant to be accessed from the Internet, while inside VPCs associated with the private hosted zone all resource records can be accessed.
+It's possible to use a technique called Split-view for public and internal use with the same zone name. A common architecure is to make the public hosted zone a subset of the private hosted zone containing only those records that are meant to be accessed from the Internet, while inside VPCs associated with the private hosted zone, all resource records can be accessed.
 
-### 1.9.2. Route 53 Health Checks
+### 1.9.3 CNAME vs R53 Alias
+CNAME maps a NAME to another NAME
+
+CNAME is invalid for naked/apex e.g. the following is **not** allowed:
+```bash
+www.catagram.io => catagram.io
+```
+Many AWS services use a DNS name (e.g. ELBs) so CNAME's can't be used to point apex `catagram.io` at it but `www.catagram.io` is valid.
+
+ALIAS records are the solution. Can point `catagram.io` at AWS resources.
+
+In exam default to picking ALIAS record type for AWS services.
+
+
+### 1.9.4. Route 53 Health Checks
 
 Route checks will allow for periodic health checks on the servers.
 If one of the servers has a bug, this will be removed from the list.
 
-If the bug gets fixed, the health check will pass and the server will be
-added back into a healthy state.
+If the bug gets fixed, the health check will pass and the server will be added back into a healthy state.
 
 Health checks are separate from, but are used by records inside R53.
 You don't create health checks inside records themselves.
 
-These are performed by a fleet of global health checkers. If you think
-they are bots and block them, this could cause alarms.
+These are performed by a fleet of global health checkers. If you think they are bots and block them, this could cause alarms.
 
-Checks occur every 30 seconds by default. This can be increased to 10 seconds
-for additional costs. These checks are per health checker. Since there are many you will automatically get one every few seconds. The 10 second option will complete multiple checks per second.
+Checks occur every 30 seconds by default. This can be increased to 10 seconds for additional costs. These checks are per health checker. Since there are many you will automatically get one every few seconds. The 10 second option will complete multiple checks per second.
 
 There could be one of three checks:
 
@@ -3002,53 +3008,32 @@ There are three types of checks.
 - CloudWatch alarms
 - Checks of checks (calculated)
 
-### 1.9.3. Route 53 Routing Policies Examples
+### 1.9.5. Route 53 Routing Policies Examples
 
-- **Simple**: Route traffic to a single resource. Client queries the resolver
-which has one record. It can have multiple values in a record e.g. It could respond with 3 values and these get forwarded
-back to the client. The client then picks one of the three at random.
-This is a single record only. No health checks.
+- **Simple**: Route traffic to a single resource. Client queries the resolver which has one record. It can have multiple values in a record e.g. It could respond with 3 values and these get forwarded back to the client. The client then picks one of the three at random. This is a single record only. No health checks.
 
-- **Failover**: Create two records of the same name and the same type. One
-is set to be the primary and the other is the secondary. This is the same
-as the simple policy except for the response. Route 53 knows the health of
-both instances. As long as the primary is healthy, it will respond with
-this one. If the health check with the primary fails, the backup will be
-returned instead. This is set to implement active - passive failover.
+- **Failover**: Create two records of the same name and the same type. One is set to be the primary and the other is the secondary. This is the same as the simple policy except for the response. Route 53 knows the health of both instances. As long as the primary is healthy, it will respond with this one. If the health check with the primary fails, the backup will be returned instead. This is set to implement active - passive failover.
 
-- **Weighted**: Create multiple records of the same name within the hosted zone.
-For each of those records, you provide a weighted value. The total weight
-is the same as the weight of all the records of the same name. If all of the
-parts of the same name are healthy, it will distribute the load based
-on the weight. If one of them fails its health check, it will be skipped over
-and over again until a good one gets hit. This can be used for migration
-to separate servers.
+- **Weighted**: Create multiple records of the same name within the hosted zone. For each of those records, you provide a weighted value. The total weight is the same as the weight of all the records of the same name. If all of the parts of the same name are healthy, it will distribute the load based on the weight. If one of them fails its health check, it will be skipped over and over again until a good one gets hit. This can be used for migration to separate servers.
 
-- **Latency-based**: Multiple records in a hosted zone can be created with
-the same name and same type. When a client request arrives, it knows which
-region the request comes from. It knows the lowest latency and will respond
-with the lowest latency.
+- **Latency-based**: Multiple records in a hosted zone can be created with the same name and same type. When a client request arrives, it knows which region the request comes from. It knows the lowest latency and will respond with the lowest latency.
 
-- **Geolocation**: Focused to delivering results matching the query of your
-customers. The record will first be matched based on the country if possible.
-If this does not happen, the record will be checked based on the continent.
-Finally, if nothing matches again it will respond with the default response.
-This can be used for licensing rights. If overlapping regions occur,
-the priority will always go to the most specific or smallest region. The US
-will be chosen over the North America record.
+- **Geolocation**: Focused to delivering results matching the query of your customers. The record will first be matched based on the country if possible. If this does not happen, the record will be checked based on the continent. Finally, if nothing matches again it will respond with the default response. This can be used for licensing rights. If overlapping regions occur, the priority will always go to the most specific or smallest region. The US will be chosen over the North America record.
 
-- **Multi-value**: Simple records use one name and multiple values in this record.
-These will be health checked and the unhealthy responses will automatically
-be removed. With multi-value, you can have multiple records with the same
-name and each of these records can have a health check. R53 using this method
-will respond to queries with any and all healthy records, but it removes
-any records that are marked as unhealthy from those responses. This removes
-the problem with simple routing where a single unhealthy record can make it
-through to your customers. Great alternative to simple routing when
-you need to improve the reliability, and it's an alternative to failover
-when you have more than two records to respond with, but don't want
-the complexity or the overhead of weighted routing.
+- **Multi-value**: Simple records use one name and multiple values in this record. These will be health checked and the unhealthy responses will automatically be removed. With multi-value, you can have multiple records with the same name and each of these records can have a health check. R53 using this method will respond to queries with any and all healthy records, but it removes any records that are marked as unhealthy from those responses. This removes the problem with simple routing where a single unhealthy record can make it through to your customers. Great alternative to simple routing when you need to improve the reliability, and it's an alternative to failover when you have more than two records to respond with, but don't want the complexity or the overhead of weighted routing.
 
+-**Geoproximity**: Aims to calculate physical distance between customer and record and respond with lowest distance. We can define a bias that can be used to shrink or grow a region that customers are routed to.
+
+### 1.9.6. Route 53 Interoperability
+Route 53 is reponsible for two roles:
+- Registrar
+- Domain hosting
+
+The default is to for Route53 to perform both roles but can do only one.
+
+Common scenario is to use a 3rd-pary (e.g. GoDaddy) registrar with Route53 hosted name servers.
+
+Can associate domain registration with one AWS account and run the hosted zone in another.
 ---
 
 ## 1.10. Relational-Database-Service-RDS
