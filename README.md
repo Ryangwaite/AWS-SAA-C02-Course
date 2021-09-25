@@ -3565,11 +3565,8 @@ EFS moves the instances closer to being stateless.
 
 #### 1.11.1.1. Elastic File System Explained
 
-EFS runs inside a VPC. Inside EFS you create file systems and these use POSIX
-permissions. EFS is made available inside a VPC via mount targets.
-Mount targets have IP addresses taken from the IP address range of the
-subnet they're inside. For HA, you need to make sure that you put mount
-targets in each AZ the system runs in.
+EFS runs inside a VPC. Inside EFS you create file systems and these use POSIX permissions. EFS is made available inside a VPC via mount targets.
+Mount targets have IP addresses taken from the IP address range of the subnet they're inside. For HA, you need to make sure that you put mount targets in each AZ the system runs in.
 
 You can use hybrid networking to connect to the same mount targets.
 
@@ -3595,8 +3592,7 @@ You can use hybrid networking to connect to the same mount targets.
 
 ### 1.12.1. Load Balancing Fundamentals
 
-Using one server is risky because that server can have performance issues
-or be completely unavailable, thus bringing down an application.
+Using one server is risky because that server can have performance issues or be completely unavailable, thus bringing down an application.
 
 A better solution is to use multiple servers.
 Without load balancing, this could bring additional problems.
@@ -3610,19 +3606,14 @@ Without load balancing, this could bring additional problems.
 
 The user connects to a load balancer that is set to listen on port 80 and 443.
 
-Within AWS, the configuration for which ports the load balancer listens on is
-called a **listener**.
+Within AWS, the configuration for which ports the load balancer listens on is called a **listener**.
 
 The user is connected to the load balancer and not the actual server.
 
 Behind the load balancer, there is an application server.
-At a high level when the user connects to the load balancer, it distributes
-that load to servers on the application server. The users client thinks it is
-talking directly to the application server.
+At a high level when the user connects to the load balancer, it distributes that load to servers on the application server. The users client thinks it is talking directly to the application server.
 
-LB will run health checks against all of the servers. If one of the servers
-does fail, the load balancer will realize this and stop sending connections
-to that server. From the users client, the application always works.
+LB will run health checks against all of the servers. If one of the servers does fail, the load balancer will realize this and stop sending connections to that server. From the users client, the application always works.
 
 As long as 1+ servers are operational, the LB is operational.
 Clients shouldn't see errors that occur with one server.
@@ -3639,8 +3630,7 @@ Clients shouldn't see errors that occur with one server.
 
 ### 1.12.2. Application Load Balancer (ALB)
 
-ALB is a layer 7 or Application Layer Load Balancer. It is capable of inspecting data that passes through it. It can understand the application layer `http` and `https` and
-take actions based on things in those protocols like paths, headers, and hosts.
+ALB is a layer 7 or Application Layer Load Balancer. It is capable of inspecting data that passes through it. It can understand the application layer `http` and `https` and take actions based on things in those protocols like paths, headers, and hosts.
 
 ![OSI Model](/Learning-Aids/14-HA-and-Scaling/OSINetworkModel.png)
 
@@ -3661,18 +3651,12 @@ LB billed based on two things:
 
 #### 1.12.2.1. Cross zone load balancing
 
-Each node that is part of the load balancer is able to distribute load
-across all instances across all AZ that are registered with that LB,
-even if its not in the same AZ. It is the reason we can achieve a balanced
-distribution of connections behind a load balancer.
+Each node that is part of the load balancer is able to distribute load across all instances across all AZ that are registered with that LB, even if its not in the same AZ. It is the reason we can achieve a balanced distribution of connections behind a load balancer.
 
 It can also provide health checks on the target servers.
 If all instances are shown as healthy, it can distribute evenly.
 
-ALB can support a wide array of targets. Targets are grouped within target
-groups and an individual target can be a member of multiple groups. It's the
-groups which ALBs distribute connections to. You could create rules
-to direct traffic to different Target Groups based on their DNS.
+ALB can support a wide array of targets. Targets are grouped within target groups and an individual target can be a member of multiple groups. It's the groups which ALBs distribute connections to. You could create rules to direct traffic to different Target Groups based on their DNS.
 
 #### 1.12.2.2. ALB Exam PowerUp
 
@@ -3716,8 +3700,7 @@ LTs can be used to save time when provisioning EC2 instances from the console UI
   - desired capacity
   - maximum size
 
-Provision or terminate instances to keep at the desired level
-Scaling Policies can trigger this based on metrics.
+Provision or terminate instances to keep at the desired level Scaling Policies can trigger this based on metrics.
 
 Autoscaling Groups will distribute EC2 instances to try and keep the AZs equal.
 
@@ -3734,17 +3717,13 @@ There are three types of scaling policies:
 - Stepped: If CPU usage is above 50%, add one, if above 80% add three
 - Target: Desired aggregate CPU = 40%, auto-scaling-group will achieve this.
 
-**Cooldown Period** is how long to wait at the end of a scaling action before
-scaling again. There is a minimum billable duration for an EC2 instance.
+**Cooldown Period** is how long to wait at the end of a scaling action before scaling again. There is a minimum billable duration for an EC2 instance.
 Currently this is 300 seconds.
 
-Self healing occurs when an instance has failed and AWS provisions a new
-instance in its place. This will fix most problems that are isolated to one
-instance.
+Self healing occurs when an instance has failed and AWS provisions a new instance in its place. This will fix most problems that are isolated to one instance.
 
 ASG can use the load balancer health checks rather than EC2.
-ALB status checks can be much richer than EC2 checks because they can monitor
-the status of HTTP and HTTPS requests. This makes them more application aware.
+ALB status checks can be much richer than EC2 checks because they can monitor the status of HTTP and HTTPS requests. This makes them more application aware.
 
 - Autoscaling Groups are free, only billed for the resources deployed.
 - Always use cool downs to avoid rapid scaling.
@@ -3758,13 +3737,11 @@ Part of AWS Version 2 series of load balancers.
 
 1. NLBs are Layer 4, only understand TCP and UDP.
 
-2. Can't interpret HTTP or HTTPs, but this makes it much faster in latency.
-[**EXAM HINT]** => If you see anything about latency and HTTP and HTTPS are not involved, this should default to a NLB.
+2. Can't interpret HTTP or HTTPs, but this makes it much faster in latency. [**EXAM HINT]** => If you see anything about latency and HTTP and HTTPS are not involved, this should default to a NLB.
 
 3. Rapid Scaling: There is nothing stopping NLB from load balancing on HTTP just by routing data. They would do this really fast and can deliver millions of requests per second.
 
-4. Only member of the load balancing family that can be provided a static IP.
-There is 1 interface per AZ. Can also use Elastic IPs (whitelisting on firewalls) and should be used for this purpose.
+4. Only member of the load balancing family that can be provided a static IP. There is 1 interface per AZ. Can also use Elastic IPs (whitelisting on firewalls) and should be used for this purpose.
 
 5. Can perform SSL pass through.
 
@@ -3777,72 +3754,58 @@ There is 1 interface per AZ. Can also use Elastic IPs (whitelisting on firewalls
 One or more clients makes one or more connections to a load balancer.
 The load balancer is configured so its **listener** uses HTTPS, SSL connections occur between the client and the load balancer.
 
-The load balancer then needs an SSL certificate that matches the domain name
-that the application uses. AWS has access to this certificate.
-If you need to be careful of where your certificates are stored, you may
-have a problem with this system.
+The load balancer then needs an SSL certificate that matches the domain name that the application uses. AWS has access to this certificate.
+If you need to be careful of where your certificates are stored, you may have a problem with this system.
 
-ELB initiates a new SSL connection to backend instances with a removed
-HTTPS certificate. This can take actions based on the content of the HTTP.
+ELB initiates a new SSL connection to backend instances with a removed HTTPS certificate. This can take actions based on the content of the HTTP.
 
-The application local balancer requires a SSL certificate because it needs
-to decrypt any data that's being encrypted by the client. Once decrypted, it
-will interpret it then create new encrypted sessions between it and the back
-end EC2 instances. The EC2 instance will need matching SSL certificates.
+The application local balancer requires a SSL certificate because it needs to decrypt any data that's being encrypted by the client. Once decrypted, it will interpret it then create new encrypted sessions between it and the back end EC2 instances. The EC2 instance will need matching SSL certificates.
 
-Needs the compute for the cryptographic operations. Every EC2 instance must
-perform these cryptographic operations. This overhead can be significant.
+Needs the compute for the cryptographic operations. Every EC2 instance must perform these cryptographic operations. This overhead can be significant.
 
-The main benefit is the elastic load balancer gets to see the unencrypted
-HTTP and can take actions based on what's contained in this plain text
-protocol.
+The main benefit is the elastic load balancer gets to see the unencrypted HTTP and can take actions based on what's contained in this plain text protocol.
 
 ![SSL Offload](Learning-Aids/14-HA-and-Scaling/SSLOffload.png)
 
 #### 1.12.6.2. Pass-through - Network Load Balancer
 
-The client connects, but the load balancer passes the connection along without decrypting the data at all. The instances still need the SSL certificates,
-but the load balancer does not. Specifically it's a network load balancer
-which is able to perform this style of connection.
+The client connects, but the load balancer passes the connection along without decrypting the data at all. The instances still need the SSL certificates, but the load balancer does not. Specifically it's a network load balancer which is able to perform this style of connection.
 
 The load balancer is configured for TCP, it can see the source or destinations, but it never touches the encrypted connection. The certificate never needs to be seen by AWS.
 
-Negative is you don't get any load balancing based on the HTTP part
-because that is never exposed to the load balancer. The EC2 instances
-still need the compute cryptographic overhead.
+Negative is you don't get any load balancing based on the HTTP part because that is never exposed to the load balancer. The EC2 instances still need the compute cryptographic overhead.
 
 #### 1.12.6.3. Offload
 
-Clients connect to the load balancer using HTTPS and are terminated on the
-load balancer. The LB needs an SSL certificate to decrypt the data, but
-on the backend the data is sent via HTTP. While there is a certificate
-required on the load balancer, this is not needed on the backend instances.
+Clients connect to the load balancer using HTTPS and are terminated on the load balancer. The LB needs an SSL certificate to decrypt the data, but on the backend the data is sent via HTTP. While there is a certificate required on the load balancer, this is not needed on the backend instances.
 
 Data is in plaintext form across AWS's network. Not a problem for most.
 
 #### 1.12.6.4. Connection Stickiness
 
-If there is no stickiness, each time the customer logs on they will have
-a stateless experience. If the state is stored on a particular server,
-sessions can't be load balanced across multiple servers.
+If there is no stickiness, each time the customer logs on they will have a stateless experience. If the state is stored on a particular server, sessions can't be load balanced across multiple servers.
 
-There is an option available within elastic load balancers called Session
-Stickiness.
+There is an option available within elastic load balancers called Session Stickiness.
 
 ![Session Stickiness](Learning-Aids/14-HA-and-Scaling/SessionStickiness.png)
 
-And within an application load balancer this is enabled on a
-target group. If enabled, the first time a user makes a request, the load
-balancer generates a cookie called AWSALB with a duration. A valid duration
-is between one second and seven days. For this time, sessions will be sent to
-the same backend instance. This will happen until:
+And within an application load balancer this is enabled on a target group. If enabled, the first time a user makes a request, the load balancer generates a cookie called AWSALB with a duration. A valid duration is between one second and seven days. For this time, sessions will be sent to the same backend instance. This will happen until:
 
 - A server failure, then the user will be moved to a different server.
 - The cookie expires, the whole process will repeat and will receive a new cookie
 
-This could cause backend unevenness because one user will always be forced
-to the same server no matter what the distributed load is. Applications
-should be designed to hold session stickiness somewhere other than EC2. You can hold session state in, for instance, DynamoDB. If store session state data externally, this means EC2 instances will be completely stateless.
+This could cause backend unevenness because one user will always be forced to the same server no matter what the distributed load is. Applications should be designed to hold session stickiness somewhere other than EC2. You can hold session state in, for instance, DynamoDB. If store session state data externally, this means EC2 instances will be completely stateless.
+
+### 1.12.7. Gateway Load Balancer
+TODO: this section
+
+Helps run and scale 3rd party appliances e.g. firewalls, intrusion detection and prevention systems.
+
+GWLB tunnels traffic and meta-data to backend appliances using **GENEVE** protocol.
+
+GWLB manages flow stickiness so one flow of data will always use one appliance.
+
+
 
 ---
 
