@@ -3056,16 +3056,12 @@ Systems to store and manage data.
 Every row in a table must have a value for the **primary key**.
 There must be a value stored for every attribute in the table.
 
-SQL systems are relational so we generally define relationships between
-tables as well. This is defined with a **join table**.
-A join table has a **composite key** which is a key formed of two parts.
-Composite keys together must be unique.
+SQL systems are relational so we generally define relationships between tables as well. This is defined with a **join table**.
+A join table has a **composite key** which is a key formed of two parts. Composite keys together must be unique.
 
-Keys in different tables are how the relationships between the tables
-are defined.
+Keys in different tables are how the relationships between the tables are defined.
 
-The Table schema and relationships must be defined in advance which can be
-hard to do.
+The Table schema and relationships must be defined in advance which can be hard to do.
 
 #### 1.10.1.2. Non-Relational (NoSQL)
 
@@ -3085,24 +3081,18 @@ DynamoDB is an example of wide column store database.
 
 Each row or item has one or more keys.
 One key is called the partition key.
-You can have additional keys other than the partition key called the
-sort or range key.
+You can have additional keys other than the partition key called the sort or range key.
 
-It can be **single key** (only partition key) or **composite key**
-(partition key and sort key).
+It can be **single key** (only partition key) or **composite key** (partition key and sort key).
 
-Every item in a table can also have attributes, but they don't have to be
-the same between values.
-The only requirements is that every item inside the table has to use the same
-key structure and it has to have a unique key.
+Every item in a table can also have attributes, but they don't have to be the same between values.
+The only requirements is that every item inside the table has to use the same key structure and it has to have a unique key.
 
 ##### 1.10.1.2.3. Document
 
 Documents are generally formatted using JSON or XML.
 
-This is an extension of a key-value store where each document is interacted
-with via an ID that's unique to that document, but the value of the document
-contents are exposed to the database allowing you to interact with it.
+This is an extension of a key-value store where each document is interacted with via an ID that's unique to that document, but the value of the document contents are exposed to the database allowing you to interact with it.
 
 Good for order databases, or collections, or contact stale databases.
 
@@ -3112,19 +3102,14 @@ Great for nested data items within a document structure such as user profiles.
 
 Often called OLTP (Online Transactional Processing Databases).
 
-If you needed to read the price of one item you need that
-row first. If you wanted to query all of the sizes of every order, you will
-need to check for each row.
+If you needed to read the price of one item you need that row first. If you wanted to query all of the sizes of every order, you will need to check for each row.
 
-Great for things which deal in rows and items where they are constantly
-accessed, modified, and removed.
+Great for things which deal in rows and items where they are constantly accessed, modified, and removed.
 
 ##### 1.10.1.2.5. Column Database (Redshift)
 
 Instead of storing data in rows on disk, they store it based on columns.
-The data is the same, but it's grouped together on disk, based on
-column so every order value is stored together, every product item, color,
-size, and price are all grouped together.
+The data is the same, but it's grouped together on disk, based on column so every order value is stored together, every product item, color, size, and price are all grouped together.
 
 This is bad for transactional style processing, but great for reporting or when all values for a specific size are required.
 
@@ -3145,7 +3130,27 @@ We might want to store the start date of any employment relationship.
 Can store massive amounts of complex relationships between data or between
 nodes in a database.
 
-### 1.10.2. Databases on EC2
+### 1.10.2. ACID vs BASE
+
+CAP theorem - Consistency, Availability, Partition Tolerant (resilience) - **choose 2**
+
+**ACID** focusses on **Consistency**, **BASE** focusses on **Availability**
+
+ - A - ATOMIC - All or No components of a transaction SUCCEEDS or FAILS
+ - C - CONSISTENT - Transactions move the DB from one 
+ - I - ISOLATED - concurrent transactions don't interfer with each other
+ - D - DURABLE - once committed, transactions are durable
+
+If see any exam questions related to ACID it's probably RDS (limits scaling)
+
+And for BASE:
+- BA - BASICALLY AVAILABLE - READ and WRITE ops available immediately. No consistency gaurantees.
+- S - SOFT-STATE - doesn't enfore consistency. This is offloaded onto application/user.
+- E - EVENTUALLY CONSISTENT - if we wait long enough, reads will be consistent.
+
+For exam, if see BASE mentioned can assume NoSQL styled DB.
+
+### 1.10.3. Databases on EC2
 
 It is always a bad idea to do this.
 
@@ -3153,7 +3158,7 @@ It is always a bad idea to do this.
   - Adds reliability consideration between the AZs
   - Adds a cost to move the data between AZs
 
-#### 1.10.2.1. Reasons EC2 Database might make sense
+#### 1.10.3.1. Reasons EC2 Database might make sense
 
 - Need access to the OS of the Database.
   - You should question if a client requests this, it rarely is needed.
@@ -3162,7 +3167,7 @@ It is always a bad idea to do this.
   - Can be a vendor that is asking for this.
 - You might need a specific version of an OS and DB that AWS doesn't provide.
 
-#### 1.10.2.2. Reasons why you really shouldn't run a database on EC2
+#### 1.10.3.2. Reasons why you really shouldn't run a database on EC2
 
 - **Admin overhead** is intense to manage the EC2 host.
 - Backup and Disaster Management adds complexity.
@@ -3172,7 +3177,7 @@ It is always a bad idea to do this.
 - **Replication** can be tricky to manage on your own.
 - Performance will be slower than other AWS options.
 
-### 1.10.3. Relational Database Service (RDS)
+### 1.10.4. Relational Database Service (RDS) Architecture
 
 - Database-as-a-service (DBaaS)
   - Not entirely true more of DatabaseServer-as-a-service.
@@ -3182,7 +3187,7 @@ It is always a bad idea to do this.
 
 Amazon Aurora. This is so different from normal RDS, it is a separate product.
 
-#### 1.10.3.1. RDS Database Instance
+#### 1.10.4.1. RDS Database Instance
 
 Runs one of a few types of database engines and can contain multiple
 user created databases. Create one when you provision the instance, but
@@ -3213,18 +3218,14 @@ magnetic - compatibility mostly for long term historic uses
 Billing is per instance and hourly rate for that compute. You are billed
 for storage allocated.
 
-### 1.10.4. RDS Multi AZ (High-Availability)
+### 1.10.5. RDS High-Availability (Multi AZ)
 
 This is an option that you can enable on RDS instances.
-Secondary hardware is allocated inside another AZ. This is referred to as
-the standby replica or standby replica instance. The standby replica has
-its own storage in the same AZ as it's located.
+Secondary hardware is allocated inside another AZ. This is referred to as the standby replica or standby replica instance. The standby replica has its own storage in the same AZ as it's located.
 
-RDS enables synchronous replication from the primary instance to the
-standby replica.
+RDS enables synchronous replication from the primary instance to the standby replica.
 
-RDS Access ONLY via database CNAME. The CNAME will point at the primary
-instance. You cannot access the standby replica for any reason via RDS.
+RDS Access ONLY via database CNAME. The CNAME will point at the primary instance. You cannot access the standby replica for any reason via RDS.
 
 The standby replica cannot be used for extra capacity.
 
@@ -3240,7 +3241,7 @@ failover within 60 to 120 seconds to change to the new database.
 
 This does not provide fault tolerance as there will be some impact during change.
 
-#### 1.10.4.1. RDS Exam PowerUp
+#### 1.10.5.1. RDS Exam PowerUp
 
 - Multi-AZ feature is not free tier, extra infrastructure for standby.
   - Generally two times the price.
@@ -3257,7 +3258,7 @@ This does not provide fault tolerance as there will be some impact during change
   - If you change the type of a RDS instance, it will failover as part of
   changing that type.
 
-### 1.10.5. RDS Backup and Restores
+### 1.10.6. RDS Backup and Restores
 
 RPO - Recovery Point Objective
 
@@ -3294,7 +3295,7 @@ based on their retention period.
 The only way to maintain backups is to create a final snapshot which will not
 expire automatically.
 
-#### 1.10.5.1. RDS Backup Exam PowerUp
+#### 1.10.6.1. RDS Backup Exam PowerUp
 
 - When performing a restore, RDS creates a new RDS with a new endpoint address.
 - When restoring a manual snapshot, you are setting it to a single point in time. This influences the RPO value.
@@ -3302,7 +3303,7 @@ expire automatically.
 - Backups are restored and transaction logs are replayed to bring DB to desired point in time.
 - Restores aren't fast, think about RTO.
 
-### 1.10.6. RDS Read-Replicas
+### 1.10.7. RDS Read-Replicas
 
 Kept in sync using **asynchronous replication**
 
@@ -3313,7 +3314,7 @@ These can be created in the same region or a different region.
 This is known as **cross region replication**. AWS handles all of the
 encryption, configuration, and networking without intervention.
 
-#### 1.10.6.1. Why do these matter
+#### 1.10.7.1. Why do these matter
 
 (READ Replicas) Performance Improvements
 
@@ -3338,13 +3339,13 @@ encryption, configuration, and networking without intervention.
 - RRs are for reads only until promoted.
 - Offers global availability improvements and global resilience.
 
-### 1.10.7. Enhanced Monitoring
+### 1.10.8. Enhanced Monitoring
 
 CloudWatch gathers metrics about CPU utilization from the hypervisor for a DB instance, and Enhanced Monitoring gathers its metrics from an agent on the instance. As a result, you might find differences between the measurements, because the hypervisor layer performs a small amount of work. The differences can be greater if your DB instances use smaller instance classes, because then there are likely more virtual machines (VMs) that are managed by the hypervisor layer on a single physical instance. 
 
 > Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU.
 
-### 1.10.8. Amazon Aurora
+### 1.10.9. Amazon Aurora
 
 Aurora architecture is VERY different from RDS.
 
@@ -3393,7 +3394,7 @@ it doesn't have to make any storage modifications.
   cluster and migrate data from the old cluster to the new cluster.
 - Storage is for the cluster and not the instances which means Replicas can be added and removed without requiring storage, provisioning, or removal.
 
-#### 1.10.8.1. Aurora Endpoints
+#### 1.10.9.1. Aurora Endpoints
 
 Aurora clusters like RDS use endpoints, so these are DNS addresses which
 are used to connect to the cluster. Unlike RDS, Aurora clusters have
@@ -3409,7 +3410,7 @@ Minimum endpoints
   - Additional replicas which are used for reads will be load balanced
   automatically.
 
-#### 1.10.8.2. Costs
+#### 1.10.9.2. Costs
 
 - No free-tier option
 - Aurora doesn't support micro instances
@@ -3420,7 +3421,7 @@ Minimum endpoints
 - 100% DB size in backups are included for free.
   - 100 GB cluster will have 100 GB of storage for backups.
 
-#### 1.10.8.3. Aurora Restore, Clone and Backtrack
+#### 1.10.9.3. Aurora Restore, Clone and Backtrack
 
 Backups in Aurora work in the same way as RDS.
 Restores create a brand new cluster.
@@ -3434,7 +3435,7 @@ It references the original storage and only stores the differences between
 the two. It uses a tiny amount of storage and only stores data that's changed
 in the clone or changed in the original after you make the clone.
 
-### 1.10.9. Aurora Serverless
+### 1.10.10. Aurora Serverless
 
 Provides a version of Aurora database product without managing the resources.
 You still create a cluster, but it uses ACUs or Aurora Capacity Units.
@@ -3457,7 +3458,7 @@ they are actually communicating with the proxy fleet. The proxy fleet
 brokers an application with the ACU and ensures you can scale in and out
 without worrying about usage. This is managed by AWS on your behalf.
 
-#### 1.10.9.1. Aurora Serverless - Use Cases
+#### 1.10.10.1. Aurora Serverless - Use Cases
 
 - Infrequently used applications.
   - Low volume blog site.
@@ -3470,7 +3471,7 @@ It can scale in and out based on demand
   - Billing a user a set dollar amount per month per license.
   - If your incoming load is directly tied to more revenue this makes sense.
 
-### 1.10.10. Aurora Global Database
+### 1.10.11. Aurora Global Database
 
 Introduces the idea of secondary regions with up to 16 read only replicas.
 Replication from primary region to secondary regions happens at the storage
@@ -3487,7 +3488,7 @@ layer and typically occurs within one second.
   - All can be promoted to Read or Write in a DR situation.
 - Maximum of 5 secondary regions.
 
-### 1.10.11. Aurora Multi-Master Writes
+### 1.10.12. Aurora Multi-Master Writes
 
 Allows an aurora cluster to have multiple instances capable of reads and writes.
 
@@ -3513,10 +3514,9 @@ on all storage nodes in the cluster.
 
 This also ensures storage is updated on in-memory cache's of other nodes.
 
-If a writer goes down in a multi-master cluster, the application will shift
-all future load over to a new writer with little if any disruption.
+If a writer goes down in a multi-master cluster, the application will shift all future load over to a new writer with little if any disruption.
 
-### 1.10.12. Database Migration Service (DMS)
+### 1.10.13. Database Migration Service (DMS)
 
 A managed database migration service.
 Starts with a replication instance which runs on top of an EC2 instance.
