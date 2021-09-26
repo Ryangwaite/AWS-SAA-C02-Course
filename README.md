@@ -3797,7 +3797,6 @@ And within an application load balancer this is enabled on a target group. If en
 This could cause backend unevenness because one user will always be forced to the same server no matter what the distributed load is. Applications should be designed to hold session stickiness somewhere other than EC2. You can hold session state in, for instance, DynamoDB. If store session state data externally, this means EC2 instances will be completely stateless.
 
 ### 1.12.7. Gateway Load Balancer
-TODO: this section
 
 Helps run and scale 3rd party appliances e.g. firewalls, intrusion detection and prevention systems.
 
@@ -3805,7 +3804,7 @@ GWLB tunnels traffic and meta-data to backend appliances using **GENEVE** protoc
 
 GWLB manages flow stickiness so one flow of data will always use one appliance.
 
-
+![Gateway Load Balancer Architecture](./Learning-Aids/14-HA-and-Scaling/GatewayLoadBalancer.png)
 
 ---
 
@@ -3902,13 +3901,11 @@ A mature event-driven architecuture only consumes resources while handling event
 Best practice is to make it very small and very specialized.
 Lambda function code, when executed is known as being **invoked**.
 When invoked, it runs inside a runtime environment that matches the language the script is written in.
-The runtime environment is allocated a certain amount of memory and an
-appropriate amount of CPU. The more memory you allocate, the more CPU it gets, and the more the function costs to invoke per second.
+The runtime environment is allocated a certain amount of memory and an appropriate amount of CPU. The more memory you allocate, the more CPU it gets, and the more the function costs to invoke per second.
 
 Lambda functions can be given an IAM role or **execution role**.
 The execution role is passed into the runtime environment.
-Whenever that function executes, the code inside has access to whatever
-permissions the role's permission policy provides.
+Whenever that function executes, the code inside has access to whatever permissions the role's permission policy provides.
 
 Lambda can be invoked in an **event-driven** or **manual** way.
 Each time you invoke a lambda function, the environment provided is new.
@@ -3986,7 +3983,7 @@ Great during an architecture evolution because the endpoints don't change.
 2. Using API gateway allows the business to evolve along the way slowly. This might move some of the data to fargate and aurora architecture.
 3. Move to a full serverless architecture with DynamoDB.
 
-### 1.13.5. Serverless
+### 1.13.5. Serverless Architecture
 
 This is not one single thing, you manage few if any servers. This aims to remove overhead and risk as much as possible. Applications are a collection of small and specialized functions that do one thing really well and then stop.
 
@@ -4167,6 +4164,26 @@ SQS:
 - Allow for async communications
 - Once the message is processed, it is deleted
 
+### 1.13.11. Amazon Cognito - User and Identity Pools
+Provides AAA for web/mobile apps.
+
+Two main pieces of functionality:
+- **USER POOLS** - Sign-in and get JWT
+  - User directory management and profiles
+  - sign-up and sign-in (customisable web UI)
+  - MFA
+- **IDENTITY POOLS** - Allow you to offer access to temporary AWS credentials
+  - unauthenticated IDs - Guest Users
+  - Federated IDs - Swap Google, Facebook, SAML2.0 and **User Pools** for short term AWS credentials to access AWS resources
+
+![User Pools](Learning-Aids/15-Serverless-and-App-Services/cognito-user-pools.png)
+
+![Identity Pools](Learning-Aids/15-Serverless-and-App-Services/cognito-identity-pools.png)
+
+Architecture combining both user and identity pools:
+
+![Using User and Identity pools together](Learning-Aids/15-Serverless-and-App-Services/cognito-user-and-identity-pools.png)
+
 ---
 
 ## 1.14. CDN-and-Optimization
@@ -4199,8 +4216,7 @@ An example is `?language=en` and `?language=es`
 Caching will cache each string parameter storing two different objects.
 You must use the same string parameters again to retrieve them. If you remove them and the object is not caching it will need to be fetched first.
 
-If string parameters aren't involved in the caching, you can select no
-to forward them to the origin.
+If string parameters aren't involved in the caching, you can select no to forward them to the origin.
 
 If the application does use **query string parameters**, you can use all of them for caching or just selected ones.
 
@@ -4224,11 +4240,9 @@ If the application does use **query string parameters**, you can use all of them
 2. The edge locations gain this identity.
 3. Create or adjust the bucket policy on the S3 origin. Add an explicit allow for the OAI. Can remove any other explicit allows on the OAI. This leaves the implicit deny.
 
-As long as accesses are coming from the edge locations, it will know they
-are from the OAI and allow them. Any direct attempts will not use the OAI and will only get the implicit deny.
+As long as accesses are coming from the edge locations, it will know they are from the OAI and allow them. Any direct attempts will not use the OAI and will only get the implicit deny.
 
-Best practice is to create one OAI per CloudFront distribution to manage
-permissions.
+Best practice is to create one OAI per CloudFront distribution to manage permissions.
 
 ### 1.14.3.(1/2) Lambda@Edge
 
@@ -4622,7 +4636,7 @@ One common directory is **Active Directory** by Microsoft and its full name is *
 
 ---
 
-## 1.17. Security-Deployment-Operations
+## 1.17. Security, Deployment and Operations
 
 ### 1.17.1. AWS Secrets Manager
 
@@ -4714,6 +4728,41 @@ AWS has no access to the HSM appliances which store the keys.
 - Oracle Databases can use CloudHSM to enable **transparent data encryption (TDE)**
 - Can protect the private keys of an issuing certificate authority.
 - Anything that needs to interact with non AWS products.
+
+### 1.17.4. AWS Config
+
+Record configuration changes over time on resources.
+
+Great for auditing changes and compliance with standards. **Does not prevent changes from happening though**
+
+Regional service but supports cross-region and account aggregation.
+
+Changes can generate SNS notifications and near-realtime events via eventbridge & lambda when resources change in terms of compliance state.
+
+Once enabled, the config of all supported resources is constantly tracked. Every time a change occurs to a resource - a configuration item (CI) is created for that resource. A CI represents the configuration of a resource at a point in time and its relationships. All CI's for a given resource is called a configuration history and is stored in S3.
+
+Resources are evaluated against config rules - either AWS managed or custom (using lambda).
+
+### 1.17.5. Amazon Macie
+
+Data **security** and data **privacy** service.
+
+Discover, Monitor and Protect Data stored in S3 Buckets
+
+Automated discovery of a data i.e. Finance
+
+Built in managed (ML/patterns) and custom Data identifiers for business (Regex based)
+
+Data discovery **jobs** use identifiers to analyse data in S3 buckets.
+
+Custom **identifiers** start with a Regex and then can be refined with:
+ - Keywords - optional sequences that need to be in proximity to regex match
+ - Maximum Match Distance - how close words are to regex pattern
+ - Ignore Words - if regex match contains ignore words, it's ignored.
+
+**Findings** are generated from this. There's two types:
+- Policy Findings - when policies or settings for S3 bucket are changed in a way that reduces the security of the bucket or its objects **after Macie is enabled**
+- Sensitive data findings - when identifiers match.
 
 ---
 
