@@ -4913,7 +4913,7 @@ $S_i = 1$ $\Rightarrow$ how many 2.5 ($\sim$3) can you get in 4, which is 1.
 
 Answer: $N_i \cdot S_i$ = $10 \cdot 1 = 10$ RCUs
 
-### 1.18.3. DynamoDB Streams and Triggers
+### 1.18.3. DynamoDB Streams and Lambda Triggers
 
 DynamoDB stream is a time ordered list of changes to items in a DynamoDB table. A stream is a 24 hour rolling window of the changes. It uses Kinesis streams on the backend.
 
@@ -5063,3 +5063,51 @@ This can be saved in the console or fed to other visualization tools.
 You can optimize the original data set to reduce the amount of space used for the data and reduce the costs for querying that data. For more information see the AWS [documentation.](https://aws.amazon.com/cloudtrail/pricing/)
 
 [^1]: For more information on Server Name Indication see the Cloudfare SNI [documentation.](https://www.cloudflare.com/learning/ssl/what-is-sni/)
+
+### 1.18.8. Elasticache
+
+In memory DB (used for high performance) but **not persistent**
+
+Can be used to cache data - for READ HEAVY workloads
+
+There's two engines:
+
+Memcached | Redis 
+---------|----------
+Simple data structuresA1 | Advanced Structures
+No replicationA2 | Multi-AZ Replication
+Multiple Nodes (sharding)A3 | Replication (Scale Reads)
+No Backups | Backup & Restore
+Multi-threaded | Transactions
+
+### 1.18.9. Redshift Architecture
+- Petabyte-scale Data warehouse
+- OLAP (column based) not OLTP (row/transaction)
+- Pay as you use ... similar structure to RDS
+- Direct Query S3 using **Redshift Spectrum**
+- Direct Query other DBs using **federated query**
+- Integrates with AWS tooling such as quicksight
+- SQL-like interface JDBC/ODBC connections
+
+Provisioned (no serverless option), as a consequence not HA so deployed in one AZ in a VPC.
+
+All redshift clusters have **Leader Node** (query input, planning and aggregation). Leader node assigns queries to **Compute Nodes**.
+
+Compute node is partitioned into slices. Each slice is allocated a portion of the nodes memory and disk space when it processes a portion of the workload assigned to the node. Slices work in parallel to compute the operation.
+
+Since its a VPC service, has access to VPC security, IAM permissions, KMS at rest encryption, CW monitoring.
+
+Remember to enable **Enhanced VPC routing** if have any customised networking requirements.
+
+![Redshift Architecture](Learning-Aids/20-NoSQL-and-DynamoDB/redshift.png)
+
+### 1.18.9.1. Redshift DR and Resilience
+Redshift runs from only one AZ.
+
+Can use S3 for backups:
+- **Automatic** - incremental backups every ~8 hours or 5GB of data and by default have 1-day retention
+- **Manual** - can be taken at any time and deleted by an admin as required.
+
+S3 replicates across 3 or more AZ's in that region making the data resilient across AZ's.
+
+Can configure snapshots to be copied to another region too with a seperate configurable retention period.
