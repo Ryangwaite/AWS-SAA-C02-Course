@@ -820,7 +820,7 @@ Some enterprises may use an AWS account while smaller ones may use the master.
 
 Allows you to switch between accounts from the command line
 
-### 1.3.7. Service Control Policies
+### 1.3.7. Service Control Policies (SCP)
 
 Can be used to restrict what member accounts in an org can do.
 
@@ -1111,12 +1111,12 @@ Multipart Upload
 - The risk of uploading large amounts of data is reduced.
 - Improves transfer rate to be the speed of all parts.
 
-S3 Accelerated Transfer
-
+S3 Transfer Acceleration
+- Enables fast, easy and secure transfers of files over long distances between your client and an S3 bucket.
 - Off by default.
 - Uses the network of AWS edge locations in CloudFront to speed up transfer.
 - Bucket name cannot contain periods.
-- Name must be DNS-compliant.
+- Name must be DNS-compliant. Access via endpoint `bucketname.s3-accelerate.amazonaws.com`
 - Benefits improve the larger the location and distance.
   - The worse the start, the better the performance benefits.
 
@@ -1185,7 +1185,7 @@ One party would take another party's public key and encrypt some data to create 
   - Can handle both symmetric and asymmetric keys.
 - KMS can perform cryptographic operations itself.
 - Keys never leave KMS.
-- Keys use **Federal Information Processing Standard (FIPS) 140-2 (L2)** security standard.
+- Keys use **Federal Information Processing Standard (FIPS) 140-2 (level 2)** security standard.
   - Some features are compliant with Level 3.
   - All features are compliant with Level 2.
 
@@ -1384,7 +1384,7 @@ Objects in S3 are stored in a specific region.
 - Default AWS storage class that's used in S3, should be user default as well.
 - S3 Standard is region resilient, and can tolerate the failure of an AZ.
 - Objects are replicated to at least 3+ AZs when they are uploaded.
-- 99999999999% durability
+- 99.999999999% durability
 - 99.99% availability
 - Offers low latency and high throughput.
 - No minimums, delays, or penalties.
@@ -1510,7 +1510,7 @@ When different accounts are used, the role is not by default trusted by the dest
 - Replication is not retroactive.
   - If you enable replication on a bucket that already has objects, the old
   objects will not be replicated.
-- Both buckets must have versioning enabled.
+- **Both buckets must have versioning enabled.**
 - It is a one way replication process only.
 - Replication by default can handle objects that are unencrypted or SSE-S3.
   - With configuration it can handle SSE-KMS, but KMS requires more configuration to work.
@@ -2243,6 +2243,8 @@ Instances can move between hosts for many reasons:
 
 The number, size, and performance of instance store volumes vary based on the type of instance used. Some instances do not have any instance store volumes at all.
 
+Instance store is also called **ephemeral** storage.
+
 #### 1.6.6.1. Instance Store Exam PowerUp
 
 - Instance store volumes are local to EC2 host.
@@ -2818,6 +2820,8 @@ CloudWatch and CloudWatch Logs cannot natively capture data inside an instance.
 
 CloudWatch Agent is required for OS visible data. It sends this data into CW.
 
+Without CloudWatch Agent only Network In and Out, CPU usage and Disk Read & Writes can be obtained. Not memory utilization.
+
 For CW to function, it needs configuration and permissions in addition to having the CW agent installed.
 The CW agent needs to know what information to inject into CW and CW Logs.
 
@@ -2845,12 +2849,9 @@ Achieves the highest level of performance possible inside EC2.
 Best practice is to launch all of the instances within that group at the same time.
 If you launch with 9 instances and AWS places you in a place with capacity for 12, you are now limited in how many you can add.
 
-Cluster placements need to be part of the same AZ. Cluster placement groups are generally the same rack, but they can even be the same
-EC2 host.
+Cluster placements need to be part of the same AZ. Cluster placement groups are generally the same rack, but they can even be the same EC2 host.
 
-All members have direct connections to each other. They can achieve
-**10 Gbps single stream** vs 5 Gbps normally. They also have the lowest
-latency and max packets-per-second (PPS) possible in AWS.
+All members have direct connections to each other. They can achieve **10 Gbps single stream** vs 5 Gbps normally. They also have the lowest latency and max packets-per-second (PPS) possible in AWS.
 
 If the hardware fails, the entire cluster will fail.
 
@@ -2862,6 +2863,7 @@ If the hardware fails, the entire cluster will fail.
 - Requires a supported instance type.
 - Best practice to use the same type of instance (not mandatory).
 - Best practice to launch all instances at once (not mandatory).
+  - If these two best practices are ignored then there's an increased chance of getting an insufficient capacity error.
 - This is the only way to achieve **10Gbps SINGLE stream performance**, other data metrics assume multiple streams.
 - Use cases: Performance, fast transfer speeds, and low consistent latency.
 
@@ -2870,7 +2872,7 @@ If the hardware fails, the entire cluster will fail.
 Keep instances separated
 
 This provides the best resilience and availability.
-Spread groups can span multiple AZs. Information will be put on distinct racks with their own network or power supply. There is a limit of 7 instances per AZ. The more AZs in a region, the more instances inside a spread placement group.
+Spread groups can span multiple AZs. Instances will be put on distinct racks with their own network and power supply. There is a limit of 7 instances per AZ. The more AZs in a region, the more instances inside a spread placement group.
 
 ![Spread Placement Group](Learning-Aids/10-Advanced-EC2/SpreadPlacementGroup.png)
 ##### 1.8.6.2.1. Spread Placement Exam PowerUp
@@ -3262,10 +3264,10 @@ This does not provide fault tolerance as there will be some impact during change
 
 RPO - Recovery Point Objective
 
-- Time between the last backup and when the failure occurred.
+- The time interval between the last backup and when the failure occurred.
 - Amount of maximum data loss.
 - Influences technical solution and cost.
-- Business usually provides an RPO value.
+- Business continuity plan usually provides a maximum RPO value that the design cannot exceed.
 
 RTO - Recovery Time Objective
 
@@ -4236,6 +4238,8 @@ If the application does use **query string parameters**, you can use all of them
 
 ### 1.14.3. Origin Access Identity (OAI)
 
+After enabling, users can only access the files througgh cloudfront, not directly from the S3 bucket.
+
 1. Identity can be associated with a CloudFront distribution.
 2. The edge locations gain this identity.
 3. Create or adjust the bucket policy on the S3 origin. Add an explicit allow for the OAI. Can remove any other explicit allows on the OAI. This leaves the implicit deny.
@@ -4275,6 +4279,9 @@ Best practice is to create one OAI per CloudFront distribution to manage permiss
   - Traffic then flows globally across the AWS global backbone network.
 - Global accelerator is a network product, and it uses non HTTP/S (TCP/UDP) protocols.
 - If you see questions that mention _caching_ that will most likely be CloudFront but, if you see questions that mention TCP or UDP and the requirement for _global performance optimization_ then possibly it's going to be global accelerator which is the right answer.
+
+### 1.14.5. CloudFront Dynamic Content Delivery
+If using services such as Elastic Load Balancers or EC2 to serve APIs to end users, performance, availability and security can be improved by using CloudFront. The end users connections are terminated at cloudfront connections closer to them which are then connected to the Amazon Backbone network which provides superior performance (vs public internet routing) and availability for connection to AWS origins.
 
 ---
 
@@ -4500,17 +4507,17 @@ You run an IPSEC VPN over the public VIF, over the Direct Connect connection, yo
   - Virtual Tapes are stored on S3
 - File Mode (SMB and NFS)
   - File Storage Backed by S3 Objects
-- Volume Mode (Gateway Stored)
-  - Block Storage backed by S3 and EBS
-  - Great for disaster recovery
-  - Data is kept locally
-  - Awesome for migrations
-- Volume Mode (Cache Mode)
-  - Data added to gateway is not stored locally.
-  - Backup to EBS Snapshots
-  - Primarily stored on AWS
+- Cached volume gateway mode:
+  - Primary data stored in S3
+  - Frequently accessed data is stored locally in cache for low latency access
   - Great for limited local storage capacity.
-
+  - Backup to EBS Snapshots
+- Stored volume gateway mode:
+  - primary data is stored locally
+  - Entire dataset is available for low latency access
+  - Asynchronously gets backed up to S3
+  - Great for disaster recovery
+  - Awesome for migrations
 ### 1.16.5. Snowball / Edge / Snowmobile
 
 Designed to move large amounts of data IN and OUT of AWS.
