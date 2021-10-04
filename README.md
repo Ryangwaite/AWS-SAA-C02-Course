@@ -329,7 +329,7 @@ Metadata:
 Parameters:
   set of parameters
 
-## Another optional section. Allows lookup tables, not used often
+## Maps keys to a corresponding named value that you specify in a conditional parameter.
 Mappings:
   set of mappings
 
@@ -4807,7 +4807,7 @@ If you choose provisioned capacity, you must set this on a per table basis.
 Capacity is set per WCU or RCU
 
 1 WCU means you can write 1KB per second to that table
-1 RCU means you can read 4KB per second for that table
+1 RCU means you can read (with strong consistency) 4KB per second for that table or two eventually consistent reads per second.
 
 #### 1.18.1.2. Dynamo DB Backups
 
